@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <include
+        android:id="@+id/toolbar_actionbar"
+        layout="@layout/toolbar_default"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"/>
+
+    <android.support.v4.widget.DrawerLayout
+        android:id="@+id/drawer"
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/toolbar_actionbar">
+
+        <FrameLayout
+            android:id="@+id/container"
+            android:layout_width="match_parent"
+            android:clickable="true"
+            android:layout_height="match_parent">
+
+
+            <RelativeLayout
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_gravity="left|center_vertical">
+
+                <TextView
+                    android:layout_width="149dp"
+                    android:layout_height="61dp"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:text="@string/Login"
+                    android:id="@+id/textView"
+                    android:layout_gravity="center_horizontal|top"
+                    android:textColor="#000000"
+                    android:paddingTop="@dimen/abc_text_size_title_material"
+                    android:theme="@style/AppTheme"
+                    style="@style/Base.TextAppearance.AppCompat.Title"
+                    android:layout_alignParentTop="true"
+                    android:layout_alignLeft="@+id/textView2"
+                    android:layout_alignStart="@+id/textView2" />
+                <!-- android:layout_marginTop="?android:attr/actionBarSize"-->
+                <fragment
+                    android:id="@+id/fragment_drawer"
+                    android:name="com.melvin.apps.materialtests.NavigationDrawerFragment"
+                    android:layout_width="@dimen/navigation_drawer_width"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="start"
+                    android:layout="@layout/fragment_navigation_drawer"/>
+
+                <Button
+                    style="?android:attr/buttonStyleSmall"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="LOGIN"
+                    android:id="@+id/button"
+                    android:layout_below="@+id/textView3"
+                    android:layout_alignLeft="@+id/textView3"
+                    android:layout_alignStart="@+id/textView3"
+                    android:layout_marginTop="74dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:text="Email"
+                    android:id="@+id/textView2"
+                    android:layout_marginTop="29dp"
+                    android:textColor="#ffffffff"
+                    android:layout_below="@+id/textView"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginStart="16dp" />
+
+                <EditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textEmailAddress"
+                    android:ems="10"
+                    android:id="@+id/editText"
+                    android:layout_below="@+id/textView2"
+                    android:layout_alignLeft="@+id/textView2"
+                    android:layout_alignStart="@+id/textView2"
+                    android:layout_marginTop="15dp"
+                    android:textColor="@color/myNavigationColor"
+                    style="@style/Base.Widget.AppCompat.EditText" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:text="Password"
+                    android:id="@+id/textView3"
+                    android:layout_marginTop="22dp"
+                    android:textColor="#ffffffff"
+                    android:layout_below="@+id/editText"
+                    android:layout_alignLeft="@+id/editText"
+                    android:layout_alignStart="@+id/editText" />
+
+                <EditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textPassword"
+                    android:ems="10"
+                    android:id="@+id/editText2"
+                    android:layout_below="@+id/textView3"
+                    android:layout_alignLeft="@+id/textView3"
+                    android:layout_alignStart="@+id/textView3"
+                    android:layout_marginTop="17dp"
+                    style="@style/Base.Widget.AppCompat.EditText" />
+
+            </RelativeLayout>
+
+        </FrameLayout>
+
+
+    </android.support.v4.widget.DrawerLayout>
+</RelativeLayout>

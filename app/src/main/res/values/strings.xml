@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">EatFlix</string>
+    <string name="drawer_open">Menu opened</string>
+    <string name="drawer_close">Menu closed</string>
+    <string name="action_settings">Settings</string>
+    <string name="add_restaurant">Add Restaurant</string>
+    <string name="Login">Login</string>
+    <string name="title_activity_restaurant">Restaurants</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="title_activity_new_restaurant">Add Restaurant</string>
+    <!--Add Restaurant strungs-->
+    <string name="restaurant_name_hint">Restaurant</string>
+    <string name="email_hint">Email</string>
+    <string name="postcode_hint">Postcode</string>
+    <string name="telephone_hint">Contact NUmber</string>
+    <string name="address_hint">Restaurant Address</string>
+    <string name="about_hint">About us</string>
+    <string name="type_hint">Type</string>
+    <string name="search_hint">Type</string>
+    <!---->
+    <string-array name="type_arrays">
+        <item value="1">bar</item>
+        <item>pub</item>
+        <item>restaurants</item>
+    </string-array>
+
+    <!---->
+    <string name="registration_msg">Registration</string>
+    <string name="registration_msg_sub">Welcome to Restauratings, App the lets you rate restaurants as you have seen them</string>
+
+
+
+    <string name="login_header">Sign In</string>
+    <string name="registration_header">Register</string>
+    <string name="restaurant_detail_header">Restaurant Details</string>
+    <string name="reviews_header">Reviews</string>
+    <string name="profile_header">My Profile</string>
+    <string name="restaurant_list_header">Restaurants Lists</string>
+
+
+    <string name="name_text">Name : John Javi Lee</string>
+    <string name="email_text">Email : jj_lee@gmail.com</string>
+    <string name="password_text">Password</string>
+    <string name="confirm_password_text">Confirm Password</string>
+    <string name="login_text">SIGN IN</string>
+
+
+    <string name="go_to_registration_text"> Dont have an account? Register</string>
+    <string name="register_text"> REGISTER</string>
+    <string name="go_to_login_text"> Already have an account? Login</string>
+    <string name="cancel_text"> CANCEL</string>
+    <string name="restaurant_registration_msg">Add Restaurant</string>
+
+
+</resources>
