@@ -63,7 +63,8 @@
         <activity
             android:name=".NewRestaurant"
             android:label="@string/title_activity_new_restaurant"
-            android:parentActivityName=".RestaurantActivity" >
+            android:parentActivityName=".RestaurantActivity"
+            android:theme="@style/AppTheme">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.melvin.apps.materialtests.RestaurantActivity" />

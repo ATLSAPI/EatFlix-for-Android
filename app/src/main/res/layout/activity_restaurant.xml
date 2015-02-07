@@ -27,7 +27,9 @@
             fab:fab_colorPressed="@color/primary_dark_material_light"
             android:layout_alignParentBottom="true"
             android:layout_centerHorizontal="true"
-            android:layout_marginBottom="16dp"/>
+            android:layout_marginBottom="16dp"
+            android:onClick="AddRestaurant"
+            />
 
 
         <TextView android:text="@string/hello_world" android:layout_width="wrap_content"

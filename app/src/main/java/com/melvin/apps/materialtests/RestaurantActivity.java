@@ -7,7 +7,10 @@ import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Button;
+
+import com.getbase.floatingactionbutton.FloatingActionButton;
 
 import static android.app.PendingIntent.getActivity;
 
@@ -15,6 +18,9 @@ import static android.app.PendingIntent.getActivity;
 public class RestaurantActivity extends BaseActivity {
     private  Toolbar mToolbar;
     Button b1;
+    FloatingActionButton floatingActionButton;
+    View.OnClickListener add_restaurant;
+    Intent intent;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -22,6 +28,14 @@ public class RestaurantActivity extends BaseActivity {
         mToolbar = (Toolbar) findViewById(R.id.toolbar_actionbar);
         setSupportActionBar(mToolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+
+
+    }
+    public void AddRestaurant(View view) {
+        intent = new Intent(this, NewRestaurant.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(intent);
     }
 
 
@@ -37,7 +51,7 @@ public class RestaurantActivity extends BaseActivity {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
-        Intent intent;
+
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
@@ -51,9 +65,7 @@ public class RestaurantActivity extends BaseActivity {
         }
         else if(id == R.id.add_restaurant)
         {
-            intent = new Intent(this, NewRestaurant.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            this.startActivity(intent);
+
         }
         return super.onOptionsItemSelected(item);
     }

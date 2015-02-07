@@ -9,26 +9,37 @@
     <string name="Login">Login</string>
     <string name="title_activity_restaurant">Restaurants</string>
     <string name="hello_world">Hello world!</string>
+
     <string name="title_activity_new_restaurant">Add Restaurant</string>
     <!--Add Restaurant strungs-->
     <string name="restaurant_name_hint">Restaurant</string>
     <string name="email_hint">Email</string>
     <string name="postcode_hint">Postcode</string>
-    <string name="telephone_hint">Contact NUmber</string>
-    <string name="address_hint">Restaurant Address</string>
+    <string name="telephone_hint">Telephone</string>
+    <string name="address_hint">Address</string>
     <string name="about_hint">About us</string>
     <string name="type_hint">Type</string>
     <string name="search_hint">Type</string>
     <!---->
     <string-array name="type_arrays">
-        <item value="1">bar</item>
-        <item>pub</item>
-        <item>restaurants</item>
+        <item value="0">Select one</item>
+        <item value="1">Bar</item>
+        <item value="2">Pub</item>
+        <item value="3">Restaurant</item>
     </string-array>
 
+    <string-array name="cat_names">
+        <item>George</item>
+        <item>Zubin</item>
+        <item>Carlos</item>
+        <item>Frank</item>
+        <item>Charles</item>
+        <item>Simon</item>
+        <item>Fezra</item>
+        <item>Henry</item>
+        <item>Schuster</item>
+    </string-array>‏
     <!---->
-    <string name="registration_msg">Registration</string>
-    <string name="registration_msg_sub">Welcome to Restauratings, App the lets you rate restaurants as you have seen them</string>
 
 
 
