@@ -3,8 +3,12 @@ package com.melvin.apps.materialtests;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.http.HttpResponseCache;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
@@ -25,19 +29,15 @@ import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
-import com.getbase.floatingactionbutton.FloatingActionButton;
-import com.getbase.floatingactionbutton.FloatingActionsMenu;
-import android.app.Activity;
-import android.graphics.drawable.ShapeDrawable;
-import android.graphics.drawable.shapes.OvalShape;
-import android.os.Bundle;
+
 import android.view.View;
-import android.view.View.OnClickListener;
+
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -58,6 +58,9 @@ import org.json.JSONObject;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -78,19 +81,23 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerC
     private NavigationDrawerFragment mNavigationDrawerFragment;
     ListView lv1;
     ArrayAdapter<String> adapter;
+
     private static final String DEBUG_TAG = "HttpExample";
     private EditText urlText;
     private TextView textView;
     public final static String apiURL = "http://www.cheesejedi.com/rest_services/get_big_cheese.php?puzzle=1";
+    public static final String TAG = MainActivity.class.getSimpleName();
     ListAdapter mAdapter;
     ReviewAdapter reviewAdapter;
     ListView listView;
     TextView error_tv;
-
+    Context context;
+    SwipeRefreshLayout swipeRefreshLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_main_topdrawer);
         mToolbar = (Toolbar) findViewById(R.id.toolbar_actionbar);
         setSupportActionBar(mToolbar);
@@ -98,23 +105,44 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerC
         reviewAdapter = new ReviewAdapter(this);
         listView = (ListView) findViewById(R.id.reviewList);
         error_tv = (TextView) findViewById(R.id.error_tv);
+
+        swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.activity_main_swipe_refresh_layout);
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener(){
+
+            @Override
+            public void onRefresh() {
+                //listView.setAdapter(reviewAdapter);
+
+                LongRunningGetIO longRunningGetIO = new LongRunningGetIO();
+                longRunningGetIO.execute("reviews_get", "get");
+                swipeRefreshLayout.setRefreshing(false);
+            }
+        });
         /**
          * Check internet connection first
          */
-        LongRunningGetIO longRunningGetIO = new LongRunningGetIO();
-        longRunningGetIO.execute("reviews_get", "get");
+
+        try {
+            LongRunningGetIO longRunningGetIO = new LongRunningGetIO();
+            longRunningGetIO.execute("reviews_get", "get");
+
         AdapterView.OnItemClickListener t1 = new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-
                Toast.makeText(MainActivity.this, "AM here" + "" + reviews_id.get(i), Toast.LENGTH_LONG).show();
 //        Intent intent = new Intent(MainActivity.this, RestaurantActivity.class);
 //        intent.putExtra("selected_restaurants_id",reviews_id.get(i));
 //        startActivity(intent);
             }
         };
-
+//        Connection nn = new Connection();
+//        Boolean bb = false;
+//        Toast toast = Toast.makeText(context.getApplicationContext(), bb.toString(),Toast.LENGTH_LONG);
+//        toast.show();
         listView.setOnItemClickListener(t1);
+        } catch (Exception e) {
+            Toast.makeText(MainActivity.this, "Error occured", Toast.LENGTH_LONG).show();
+        }
 
         //listView.setAdapter(reviewAdapter);
         /**
@@ -131,6 +159,16 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerC
     private class emailVerificationResult {
         public String statusNbr;
         public String hygieneResult;
+    }
+
+    private boolean isNetworkConnected() {
+        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo ni = cm.getActiveNetworkInfo();
+        if (ni == null) {
+            // There are no active networks.
+            return false;
+        } else
+            return true;
     }
 
     @Override
@@ -192,6 +230,7 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerC
                                     tempObject.getString("created"),
                                     tempObject.getString("modified"),
                                     tempObject.getString("description"),
+                                    //tempObject.getString("image"),
                                     tempObject.getString("rating")));
                             reviews_id.add(tempObject.getInt("id"));
                        }
@@ -330,6 +369,7 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerC
         String created;
         String description;
         String rating;
+        //String image;
 
 
         SingleRow(String restaurant, String type, String postcode, String cuisine, String created, String description, String rating)
@@ -341,6 +381,7 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerC
             this.created = created;
             this.rating = rating;
             this.description = description;
+            //this.image = image;
         }
 
     }
@@ -378,17 +419,19 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerC
         }
         class MyViewHolder {
             TextView tv1, tv2, tv3, tv4, tv5, tv6;
+            LinearLayout l1;
             RatingBar r1;
             MyViewHolder(View view)
             {
                 ///Instantiate views here....
-                tv1 = (TextView) view.findViewById(R.id.header);
+                //tv1 = (TextView) view.findViewById(R.id.header);
                 tv2 = (TextView) view.findViewById(R.id.restaurant);
                 tv3 = (TextView) view.findViewById(R.id.type);
                 tv4 = (TextView) view.findViewById(R.id.created);
                 tv5 = (TextView) view.findViewById(R.id.description);
                 tv6 = (TextView) view.findViewById(R.id.cuisine);
                 r1 = (RatingBar) view.findViewById(R.id.rating);
+                //l1 = (LinearLayout) findViewById(R.id.background);
                 r1.isInEditMode();
             }
         }
@@ -408,15 +451,29 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerC
                 holder = (MyViewHolder) row.getTag();
                 Log.d("Test", "Creating");
             }
+
+
+
             ///Set here....
             SingleRow temp = list.get(i);
-            holder.tv1.setText(temp.restaurant);
+
+            //holder.tv1.setText(temp.restaurant);
             holder.tv2.setText(temp.restaurant);
             holder.tv3.setText(temp.type);
             holder.tv4.setText(temp.created);
             holder.tv5.setText(temp.description);
             holder.tv6.setText(temp.cuisine);
             holder.r1.setRating(Integer.parseInt(temp.rating));
+
+//            try {
+//                File imagefile = new File(temp.image);
+//                FileInputStream fis = new FileInputStream(imagefile);
+//                Bitmap bmImg = BitmapFactory.decodeStream(fis);
+//                BitmapDrawable background = new BitmapDrawable(bmImg);
+//                //holder.l1.setBackgroundDrawable(background);
+//            } catch (FileNotFoundException e) {
+//                //e.printStackTrace();
+//            }
             return row;
         }
     }
