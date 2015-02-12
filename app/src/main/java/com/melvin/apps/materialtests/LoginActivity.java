@@ -401,7 +401,7 @@ public class LoginActivity extends PlusBaseActivity implements LoaderCallbacks<C
         public String GetData(String username, String password) {
             String userCredentials = username+":"+password;
             String ret= "Basic "+ Base64.encodeToString(userCredentials.getBytes(), Base64.URL_SAFE | Base64.NO_WRAP);
-            String url = "http://eatflix.x10.mx/v1/users/login";
+            String url = "http://timothysnw.co.uk/v1/users/login";
             HttpClient httpclient = new DefaultHttpClient();
             HttpPost httpPost = new HttpPost(url);
             httpPost.setHeader("Authorization", ret);
@@ -434,6 +434,7 @@ public class LoginActivity extends PlusBaseActivity implements LoaderCallbacks<C
                     e.printStackTrace();
                 }
             }
+            httpclient.getConnectionManager().shutdown();
             return data;
         }
 

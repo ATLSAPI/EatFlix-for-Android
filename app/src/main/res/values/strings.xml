@@ -9,9 +9,8 @@
     <string name="Login">Login</string>
     <string name="title_activity_restaurant">Restaurants</string>
     <string name="hello_world">Hello world!</string>
-
     <string name="title_activity_new_restaurant">Add Restaurant</string>
-    <!--Add Restaurant strings-->
+    <!-- Add Restaurant strings -->
     <string name="restaurant_name_hint">Restaurant</string>
     <string name="email_hint">Email</string>
     <string name="postcode_hint">Postcode</string>
@@ -20,7 +19,7 @@
     <string name="about_hint">About us</string>
     <string name="type_hint">Type</string>
     <string name="search_hint">Type</string>
-    <!---->
+    <!--  -->
     <string-array name="type_arrays">
         <item value="0">Select type</item>
         <item value="1">Bar</item>
@@ -33,7 +32,6 @@
         <item value="2">Portuguese</item>
         <item value="3">Mixed</item>
     </string-array>
-
     <string-array name="cat_names">
         <item>George</item>
         <item>Zubin</item>
@@ -44,10 +42,8 @@
         <item>Fezra</item>
         <item>Henry</item>
         <item>Schuster</item>
-    </string-array>‏
-    <!---->
-
-
+    </string-array>
+‏    <!--  -->
 
     <string name="login_header">Sign In</string>
     <string name="registration_header">Register</string>
@@ -55,22 +51,19 @@
     <string name="reviews_header">Reviews</string>
     <string name="profile_header">My Profile</string>
     <string name="restaurant_list_header">Restaurants Lists</string>
-
-
     <string name="name_text">Name : John Javi Lee</string>
     <string name="email_text">Email : jj_lee@gmail.com</string>
     <string name="password_text">Password</string>
     <string name="confirm_password_text">Confirm Password</string>
     <string name="login_text">SIGN IN</string>
-
-
     <string name="go_to_registration_text"> Don\'t have an account? Register</string>
-    <string name="register_text"> UPLOAD IMAGE</string>
+    <string name="register_text">ATTACH IMAGE</string>
     <string name="go_to_login_text"> Already have an account? Login</string>
     <string name="cancel_text">CANCEL</string>
     <string name="restaurant_registration_msg">Add Restaurant</string>
     <string name="town_hint">Town</string>
     <string name="desc_hint">Description</string>
+    <string name="title_activity_splash">EatFlix</string>
 
 
 </resources>

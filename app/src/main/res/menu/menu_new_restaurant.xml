@@ -2,8 +2,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.melvin.apps.materialtests.NewRestaurant">
+    <item android:id="@+id/add_restaurant" android:title="@string/add_restaurant" android:icon="@drawable/ic_attach_file_white_24dp"
+        android:orderInCategory="100" app:showAsAction="always" />
     <item android:id="@+id/submit_restaurant" android:title="@string/add_restaurant"
-        android:orderInCategory="100" android:icon="@drawable/ic_send_white_24dp" app:showAsAction="always"/>
-    <item android:id="@+id/add_restaurant" android:title="@string/add_restaurant"
-        android:orderInCategory="200" app:showAsAction="never" />
+        android:orderInCategory="200" android:icon="@drawable/ic_send_white_24dp" app:showAsAction="always"/>
+
 </menu>

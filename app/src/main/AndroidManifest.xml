@@ -12,8 +12,9 @@
     <uses-permission android:name="android.permission.GET_ACCOUNTS" /> <!-- To auto-complete the email text field in the login form with the user's emails -->
     <uses-permission android:name="android.permission.READ_PROFILE" />
     <uses-permission android:name="android.permission.READ_CONTACTS" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
         android:allowBackup="true"
@@ -23,13 +24,10 @@
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name" >
-            <!--<meta-data android:name="android.app.searchable"-->
-            <!--android:resource="@layout/searchable" />-->
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
+            <!-- <meta-data android:name="android.app.searchable" -->
+            <!-- android:resource="@layout/searchable" /> -->
+
         </activity>
 
         <meta-data
@@ -53,35 +51,45 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.melvin.apps.materialtests.MainActivity" />
         </activity>
-        <!--<activity-->
-            <!--android:name=".LoginActivity"-->
-            <!--android:label="@string/title_activity_login"-->
-            <!--android:parentActivityName=".MainActivity"-->
-            <!--android:windowSoftInputMode="adjustResize|stateHidden" >-->
-            <!--<meta-data-->
-                <!--android:name="android.support.PARENT_ACTIVITY"-->
-                <!--android:value="com.melvin.apps.materialtests.MainActivity" />-->
-        <!--</activity>-->
+        <!-- <activity -->
+        <!-- android:name=".LoginActivity" -->
+        <!-- android:label="@string/title_activity_login" -->
+        <!-- android:parentActivityName=".MainActivity" -->
+        <!-- android:windowSoftInputMode="adjustResize|stateHidden" > -->
+        <!-- <meta-data -->
+        <!-- android:name="android.support.PARENT_ACTIVITY" -->
+        <!-- android:value="com.melvin.apps.materialtests.MainActivity" /> -->
+        <!-- </activity> -->
         <activity
             android:name=".NewRestaurant"
             android:label="@string/title_activity_new_restaurant"
             android:parentActivityName=".RestaurantActivity"
-            android:theme="@style/AppTheme">
+            android:theme="@style/AppTheme" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.melvin.apps.materialtests.RestaurantActivity" />
 
-            <!--<intent-filter>-->
-                <!--<action android:name="android.intent.action.MAIN" />-->
+            <!-- <intent-filter> -->
+            <!-- <action android:name="android.intent.action.MAIN" /> -->
 
-                <!--<category android:name="android.intent.category.LAUNCHER" />-->
-            <!--</intent-filter>-->
+
+            <!-- <category android:name="android.intent.category.LAUNCHER" /> -->
+            <!-- </intent-filter> -->
         </activity>
-        <!--<activity android:name=".SearchResultsActivity">-->
-        <!--<intent-filter>-->
-            <!--<action android:name="android.intent.action.SEARCH" />-->
-        <!--</intent-filter>-->
-    <!--</activity>-->
+        <!-- <activity android:name=".SearchResultsActivity"> -->
+        <!-- <intent-filter> -->
+        <!-- <action android:name="android.intent.action.SEARCH" /> -->
+        <!-- </intent-filter> -->
+        <!-- </activity> -->
+        <activity
+            android:name=".SplashActivity"
+            android:label="@string/title_activity_splash" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>

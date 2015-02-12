@@ -1,7 +1,10 @@
 package com.melvin.apps.materialtests;
 
+import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.app.SearchManager;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -11,6 +14,7 @@ import android.net.NetworkInfo;
 import android.net.http.HttpResponseCache;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBarActivity;
@@ -32,6 +36,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListAdapter;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -90,9 +95,10 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerC
     ListAdapter mAdapter;
     ReviewAdapter reviewAdapter;
     ListView listView;
-    TextView error_tv;
+    TextView error_tv, netfail;
     Context context;
     SwipeRefreshLayout swipeRefreshLayout;
+    ProgressDialog progressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -105,7 +111,9 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerC
         reviewAdapter = new ReviewAdapter(this);
         listView = (ListView) findViewById(R.id.reviewList);
         error_tv = (TextView) findViewById(R.id.error_tv);
-
+        netfail = (TextView) findViewById(R.id.net_fail);
+        progressBar = new ProgressDialog(this);
+        //initialiseCache();
         swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.activity_main_swipe_refresh_layout);
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener(){
 
@@ -121,29 +129,65 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerC
         /**
          * Check internet connection first
          */
+        boolean check =  isNetworkConnected();
 
-        try {
-            LongRunningGetIO longRunningGetIO = new LongRunningGetIO();
-            longRunningGetIO.execute("reviews_get", "get");
+        if (!isNetworkConnected())
+        {
 
-        AdapterView.OnItemClickListener t1 = new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-               Toast.makeText(MainActivity.this, "AM here" + "" + reviews_id.get(i), Toast.LENGTH_LONG).show();
-//        Intent intent = new Intent(MainActivity.this, RestaurantActivity.class);
-//        intent.putExtra("selected_restaurants_id",reviews_id.get(i));
-//        startActivity(intent);
-            }
-        };
-//        Connection nn = new Connection();
-//        Boolean bb = false;
-//        Toast toast = Toast.makeText(context.getApplicationContext(), bb.toString(),Toast.LENGTH_LONG);
-//        toast.show();
-        listView.setOnItemClickListener(t1);
-        } catch (Exception e) {
-            Toast.makeText(MainActivity.this, "Error occured", Toast.LENGTH_LONG).show();
+            new AlertDialog.Builder(this)
+                    .setTitle("No network connection detected")
+                    .setMessage("Retry?")
+                    .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            try {
+                                LongRunningGetIO longRunningGetIO = new LongRunningGetIO();
+                                longRunningGetIO.execute("reviews_get", "get");
+                                AdapterView.OnItemClickListener t1 = new AdapterView.OnItemClickListener() {
+                                    @Override
+                                    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                                        //Toast.makeText(MainActivity.this, "AM here" + "" + reviews_id.get(i), Toast.LENGTH_LONG).show();
+//                        Intent intent = new Intent(MainActivity.this, RestaurantActivity.class);
+//                        intent.putExtra("selected_restaurants_id",reviews_id.get(i));
+//                        startActivity(intent);
+                                    }
+                                };
+                                listView.setOnItemClickListener(t1);
+                            } catch (Exception e) {
+                                Toast.makeText(MainActivity.this, "Error occured", Toast.LENGTH_LONG).show();
+                            }
+                            netfail.setText("No network detected. Pull down to refresh");
+                        }
+                    })
+                    .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            // do nothing
+                        }
+                    })
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .show();
         }
-
+        else {
+            try {
+                progressBar.setTitle("Loading");
+                progressBar.setMessage("Wait while loading...");
+                progressBar.show();
+                LongRunningGetIO longRunningGetIO = new LongRunningGetIO();
+                longRunningGetIO.execute("reviews_get", "get");
+                AdapterView.OnItemClickListener t1 = new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                        Toast.makeText(MainActivity.this, "AM here" + "" + reviews_id.get(i), Toast.LENGTH_LONG).show();
+//                        Intent intent = new Intent(MainActivity.this, RestaurantActivity.class);
+//                        intent.putExtra("selected_restaurants_id",reviews_id.get(i));
+//                        startActivity(intent);
+                    }
+                };
+                netfail.setVisibility(View.INVISIBLE);
+                listView.setOnItemClickListener(t1);
+            } catch (Exception e) {
+                Toast.makeText(MainActivity.this, "Error occured", Toast.LENGTH_LONG).show();
+            }
+        }
         //listView.setAdapter(reviewAdapter);
         /**
          * Nav drawer implement
@@ -156,14 +200,38 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerC
          * Get and display
          */
     }
+    public void initialiseCache()
+    {
+        File httpCacheDir = getExternalCacheDir();
+
+        // Cache Size of 5MB
+        long httpCacheSize = 5 * 1024 * 1024;
+        try {
+            // Install the custom Cache Implementation
+            com.integralblue.httpresponsecache.HttpResponseCache.install(httpCacheDir, httpCacheSize);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        com.integralblue.httpresponsecache.HttpResponseCache cache = com.integralblue.httpresponsecache.HttpResponseCache.getInstalled();
+        if(cache != null) {
+            //   If cache is present, flush it to the filesystem.
+            //   Will be used when activity starts again.
+            cache.flush();
+        }
+    }
     private class emailVerificationResult {
         public String statusNbr;
         public String hygieneResult;
     }
 
-    private boolean isNetworkConnected() {
-        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo ni = cm.getActiveNetworkInfo();
+    public boolean isNetworkConnected() {
+        NetworkInfo ni = null;
+        try {
+            ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+            ni = cm.getActiveNetworkInfo();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         if (ni == null) {
             // There are no active networks.
             return false;
@@ -187,7 +255,7 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerC
 
     @Override
     public void onNavigationDrawerItemSelected(int position) {
-        Toast.makeText(this, "Menu item selected -> " + position, Toast.LENGTH_SHORT).show();
+        //Toast.makeText(this, "Menu item selected -> " + position, Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -203,8 +271,8 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerC
         ArrayList<SingleRow> list = new ArrayList<SingleRow>();
         @Override
         protected void onPreExecute() {
-            myMap.put("review_get","http://eatflix.x10.mx/v1/reviews");
-            myMap.put("review_post","http://eatflix.x10.mx/v1/reviews");
+            myMap.put("review_get","http://timothysnw.co.uk/v1/reviews");
+            myMap.put("review_post","http://timothysnw.co.uk/v1/reviews");
             super.onPreExecute();
         }
 
@@ -212,7 +280,7 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerC
         protected String doInBackground(String... params) {
             String result="bbs";
             if(params[1].equals("get")) {
-               result = getData("http://eatflix.x10.mx/v1/reviews");
+               result = getData("http://timothysnw.co.uk/v1/reviews");
                 try {
                   JSONArray jsonArray = new JSONArray(result);
                     JSONObject tempObject;
@@ -240,17 +308,20 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerC
                 }
            }
             else if(params[1].equals("post")){
-                result =postData("http://eatflix.x10.mx/v1/reviews");
+                result =postData("http://timothysnw.co.uk/v1/reviews");
             }
             return params[1];
         }
 
         @Override
         protected void onPostExecute(String s) {
+            Toast.makeText(MainActivity.this, s, Toast.LENGTH_LONG).show();
             if (s.equals("get")) {
                 reviewAdapter.setItemList(list);
                 listView.setAdapter(reviewAdapter);
                 reviewAdapter.notifyDataSetChanged();
+                progressBar.dismiss();
+                //Toast.makeText(MainActivity.this, s, Toast.LENGTH_LONG).show();
                 //error_tv.setText(s);
             }
             else{
@@ -275,6 +346,9 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerC
                     String data = EntityUtils.toString(entity);
                     return data;
               }
+                else {
+                    httpclient.getConnectionManager().shutdown();
+                }
 
             } catch (IOException e) {
                 e.printStackTrace();
@@ -306,7 +380,7 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerC
                 inputStream = response.getEntity().getContent();
 
                 String status = " "+response.getStatusLine();
-
+                httpClient.getConnectionManager().shutdown();
                 if(inputStream != null) {
                     result = convertInputStreamToString(inputStream);
                 }

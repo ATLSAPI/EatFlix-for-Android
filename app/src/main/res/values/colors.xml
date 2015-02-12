@@ -19,4 +19,17 @@
     <color name="myTextSecondaryColor">#4F0909</color>
     <color name="myNavigationColor">#000000</color>
     <color name="selected_gray">#ffdbdbdb</color>
+
+    <integer-array name="gplus_colors">
+        <item>@color/gplus_color_1</item>
+        <item>@color/gplus_color_2</item>
+        <item>@color/gplus_color_3</item>
+        <item>@color/gplus_color_4</item>
+    </integer-array>‏
+
+    <color name="gplus_color_1">#3e802f</color>
+    <color name="gplus_color_2">#f4b400</color>
+    <color name="gplus_color_3">#427fed</color>
+    <color name="gplus_color_4">#b23424</color>
+
 </resources>
