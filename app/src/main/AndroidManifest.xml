@@ -90,6 +90,23 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".NewReviewActivity"
+            android:label="@string/title_activity_new_review"
+            android:parentActivityName=".RestaurantActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.melvin.apps.materialtests.RestaurantActivity" />
+        </activity>
+        <activity
+            android:name=".RegisterActivity"
+            android:label="@string/title_activity_register"
+            android:theme="@style/AppTheme.Dialog"
+            android:parentActivityName=".LoginActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.melvin.apps.materialtests.LoginActivity" />
+        </activity>
     </application>
 
 </manifest>

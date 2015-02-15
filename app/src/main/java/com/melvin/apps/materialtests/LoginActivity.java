@@ -4,17 +4,26 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 
+import android.app.AlertDialog;
 import android.app.LoaderManager.LoaderCallbacks;
+import android.app.ProgressDialog;
 import android.content.ContentResolver;
+import android.content.Context;
 import android.content.CursorLoader;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.Loader;
+import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
 
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
+import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Base64;
@@ -26,6 +35,9 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FrameLayout;
+import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -35,13 +47,19 @@ import com.google.android.gms.common.SignInButton;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -79,6 +97,12 @@ public class LoginActivity extends PlusBaseActivity implements LoaderCallbacks<C
     private View mSignOutButtons;
     private View mLoginFormView;
     private Toolbar mToolbar;
+    private ScrollView scrollView_login, scrollView_profile;
+    private LinearLayout login_layout;
+    private TextView logout_btn;
+    private ProgressDialog progressDialog;
+
+    SharedPreferences sharedPreferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,6 +111,9 @@ public class LoginActivity extends PlusBaseActivity implements LoaderCallbacks<C
         mToolbar = (Toolbar) findViewById(R.id.toolbar_actionbar);
         setSupportActionBar(mToolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        sharedPreferences = getSharedPreferences("Auth",MODE_PRIVATE);
+        progressDialog = new ProgressDialog(this);
+
 
         // Find the Google+ sign in button.
         mPlusSignInButton = (SignInButton) findViewById(R.id.plus_sign_in_button);
@@ -121,6 +148,7 @@ public class LoginActivity extends PlusBaseActivity implements LoaderCallbacks<C
             }
         });
 
+
         Button mEmailSignInButton = (Button) findViewById(R.id.email_sign_in_button);
         mEmailSignInButton.setOnClickListener(new OnClickListener() {
             @Override
@@ -129,10 +157,131 @@ public class LoginActivity extends PlusBaseActivity implements LoaderCallbacks<C
             }
         });
 
+        //Define Views
+        scrollView_profile = (ScrollView) findViewById(R.id.profile_view);
+        login_layout = (LinearLayout) findViewById(R.id.login_layout);
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
         mEmailLoginFormView = findViewById(R.id.email_login_form);
         mSignOutButtons = findViewById(R.id.plus_sign_out_buttons);
+
+        //Check if user is already logged in
+        if (sharedPreferences.contains("token") && sharedPreferences.contains("id") && sharedPreferences.contains("device_id"))
+        {
+            //User is logged in
+            login_layout.removeViewAt(2);
+            setTitle("Profile");
+            //Sign out
+            logout_btn = (TextView) findViewById(R.id.logout);
+            logout_btn.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    //User logs out
+                    if(!isNetworkConnected())
+                    {
+                        new AlertDialog.Builder(LoginActivity.this).
+                                setMessage("Network connection unavailable")
+                                .setCancelable(false)
+                                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+
+                                    }
+                                })
+                                .show();
+                    } else {
+                        progressDialog.setTitle("Sign out");
+                        progressDialog.setMessage("Signing you out...");
+                        progressDialog.show();
+                        new Logout().execute();
+                    }
+
+                }
+            });
+        }
+        else
+        {
+            login_layout.removeViewAt(3);
+
+        }
+
+    }
+    public boolean isNetworkConnected() {
+        NetworkInfo ni = null;
+        try {
+            ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+            ni = cm.getActiveNetworkInfo();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if (ni == null) {
+            // There are no active networks.
+            return false;
+        } else
+            return true;
+    }
+    private class Logout extends AsyncTask<String,String, String>
+    {
+
+        @Override
+        protected String doInBackground(String... strings) {
+            String url = "http://timothysnw.co.uk/v1/users/logout/";
+            String result = "";
+            if (sharedPreferences.contains("device_id"))
+            {
+                String device_id = sharedPreferences.getString("device_id", "");
+                if(!device_id.equals("undefined"))
+                {
+                    url = url+device_id;
+                    HttpClient httpclient = new DefaultHttpClient();
+                    HttpPost httpPost = new HttpPost(url);
+                    httpPost.setHeader("Token", sharedPreferences.getString("token",""));
+                    HttpResponse response = null;
+                    int status = 0;
+                    try {
+                        response = httpclient.execute(httpPost);
+                        status  = response.getStatusLine().getStatusCode();
+                        if (status == 204)
+                        {
+                            SharedPreferences.Editor editor = getSharedPreferences("Auth", MODE_PRIVATE).edit();
+                            editor.clear();
+                            editor.commit();
+                            result = "OK";
+                        }
+                        else
+                        {
+                            result = "Failed"+status;
+                        }
+                    } catch (IOException e) {
+                        result = "Failed"+status;
+                        e.printStackTrace();
+                    }
+                }
+            }
+
+            return result;
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            Toast.makeText(LoginActivity.this, s, Toast.LENGTH_SHORT).show();
+            if (s=="OK")
+            {
+                progressDialog.dismiss();
+                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                finish();
+                startActivity(intent);
+                Toast.makeText(LoginActivity.this, "You've been signed out", Toast.LENGTH_SHORT).show();
+            }
+            else {
+                progressDialog.dismiss();
+            }
+            //super.onPostExecute(s);
+        }
+    }
+    public void Register(View view) {
+        Intent intent1 = new Intent(LoginActivity.this, RegisterActivity.class);
+        startActivity(intent1);
     }
 
     private void populateAutoComplete() {
@@ -404,6 +553,14 @@ public class LoginActivity extends PlusBaseActivity implements LoaderCallbacks<C
             String url = "http://timothysnw.co.uk/v1/users/login";
             HttpClient httpclient = new DefaultHttpClient();
             HttpPost httpPost = new HttpPost(url);
+            String model = Build.MODEL;
+            List<NameValuePair> name_value = new ArrayList<NameValuePair>();
+            name_value.add(new BasicNameValuePair("device_name",model));
+            try {
+                httpPost.setEntity(new UrlEncodedFormEntity(name_value));
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
             httpPost.setHeader("Authorization", ret);
             HttpResponse response = null;
             try {
@@ -419,6 +576,18 @@ public class LoginActivity extends PlusBaseActivity implements LoaderCallbacks<C
                 HttpEntity entity = response.getEntity();
                 try {
                     data = EntityUtils.toString(entity);
+                    try {
+                        JSONObject jsonObject = new JSONObject(data);
+                        SharedPreferences.Editor editor = getSharedPreferences("Auth", MODE_PRIVATE).edit();
+                        editor.putString("token", jsonObject.getString("token"));
+                        editor.putString("id", jsonObject.getString("id"));
+                        editor.putString("device_id", jsonObject.getString("device_id"));
+                        editor.putString("device_id", jsonObject.getString("device_id"));
+                        //editor.apply();
+                        editor.commit();
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
                     //Success
                 } catch (IOException e) {
                     e.printStackTrace();

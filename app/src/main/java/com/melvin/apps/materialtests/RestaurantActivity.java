@@ -1,8 +1,11 @@
 package com.melvin.apps.materialtests;
 
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -20,6 +23,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -70,6 +74,10 @@ public class RestaurantActivity extends BaseActivity {
     View convertView;
     ProgressDialog pDialog;
     ArrayList<Restaurant> mItems;
+    SharedPreferences sharedPreferences;
+    private AlertDialog.Builder alertDialog;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -82,6 +90,8 @@ public class RestaurantActivity extends BaseActivity {
         LinearLayoutManager llm = new LinearLayoutManager(this);
         llm.setOrientation(LinearLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(llm);
+        sharedPreferences = getSharedPreferences("Auth",MODE_PRIVATE);
+
 
         SwipeableRecyclerViewTouchListener swipeTouchListener =
                 new SwipeableRecyclerViewTouchListener(recyclerView,
@@ -112,8 +122,27 @@ public class RestaurantActivity extends BaseActivity {
 
         recyclerView.addOnItemTouchListener(swipeTouchListener);
 
-
+        //Initialise Http cache
         initialiseCache();
+
+        //AlertDialog
+        //AlertDialog
+        alertDialog = new AlertDialog.Builder(this)
+                .setTitle("You need to be logged in")
+                .setMessage("Login?")
+                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        Intent intent_add = new Intent(RestaurantActivity.this, LoginActivity.class);
+                        //intent_add.putExtra("selected_restaurants_id",reviews_id.get(i));
+                        startActivity(intent_add);
+                    }
+                })
+                .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        // do nothing
+                    }
+                })
+                .setIcon(android.R.drawable.ic_dialog_alert);
         try {
             getRests hh = new getRests();
             hh.execute("jjh","jhjh","hhi");
@@ -191,9 +220,17 @@ public class RestaurantActivity extends BaseActivity {
         }
     }
     public void AddRestaurant(View view) {
-        intent = new Intent(this, NewRestaurant.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        startActivity(intent);
+        if (sharedPreferences.contains("token") && sharedPreferences.contains("id") && sharedPreferences.contains("device_id")) {
+            //User is logged in
+            intent = new Intent(this, NewRestaurant.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(intent);
+        }
+        else
+        {
+            alertDialog.show();
+            //Not Logged in
+        }
     }
 
 

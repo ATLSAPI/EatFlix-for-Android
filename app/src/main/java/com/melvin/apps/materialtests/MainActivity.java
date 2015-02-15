@@ -6,6 +6,7 @@ import android.app.SearchManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
@@ -99,6 +100,7 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerC
     Context context;
     SwipeRefreshLayout swipeRefreshLayout;
     ProgressDialog progressBar;
+    SharedPreferences sharedPreferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -113,6 +115,7 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerC
         error_tv = (TextView) findViewById(R.id.error_tv);
         netfail = (TextView) findViewById(R.id.net_fail);
         progressBar = new ProgressDialog(this);
+        sharedPreferences = getSharedPreferences("Auth",MODE_PRIVATE);
         //initialiseCache();
         swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.activity_main_swipe_refresh_layout);
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener(){
@@ -332,11 +335,11 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerC
         public String getData(String url) {
             try {
                 // Create a new HttpClient and Post Header
-                String userCredentials = "email@example.com"+":"+"password";
-                String ret="Basic "+Base64.encodeToString(userCredentials.getBytes(),Base64.URL_SAFE|Base64.NO_WRAP);
+//                String userCredentials = "email@example.com"+":"+"password";
+//                String ret="Basic "+Base64.encodeToString(userCredentials.getBytes(),Base64.URL_SAFE|Base64.NO_WRAP);
                 HttpClient httpclient = new DefaultHttpClient();
                 HttpGet httpget = new HttpGet(url);
-                httpget.setHeader("Authorization",ret);
+                //httpget.setHeader("Authorization",ret);
                 HttpResponse response = httpclient.execute(httpget);
 
                 int status = response.getStatusLine().getStatusCode();

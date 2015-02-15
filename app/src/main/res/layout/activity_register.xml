@@ -1,0 +1,131 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    tools:context="com.melvin.apps.materialtests.RegisterActivity"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+<include
+    android:id="@+id/toolbar_actionbar"
+    layout="@layout/toolbar_default"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center"/>
+
+    <LinearLayout android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:paddingTop="@dimen/register_vertical_margin"
+        android:paddingBottom="@dimen/register_vertical_margin"
+        android:orientation="vertical">
+    <LinearLayout android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:paddingBottom="@dimen/widget_horizontal_margin"
+        android:layout_marginTop="@dimen/widget_vertical_margin">
+
+
+        <EditText android:id="@+id/first_name"
+            android:textAppearance="?android:attr/textAppearanceMediumInverse"
+            android:textColor="@android:color/black"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="text"
+            android:singleLine="true"
+            android:hint="@string/first_name_text"
+            android:textColorHint="@color/ControlText"
+            style="@style/AppTheme"
+            />
+        </LinearLayout>
+
+        <LinearLayout android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:paddingBottom="@dimen/widget_horizontal_margin"
+            android:layout_marginTop="@dimen/widget_vertical_margin">
+
+
+            <EditText android:id="@+id/last_name_text"
+                android:textAppearance="?android:attr/textAppearanceMediumInverse"
+                android:textColor="@android:color/black"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="text"
+                android:singleLine="true"
+                android:hint="@string/last_name_text"
+                android:textColorHint="@color/ControlText"
+                style="@style/AppTheme"
+                />
+        </LinearLayout>
+
+        <LinearLayout android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:paddingBottom="@dimen/widget_horizontal_margin"
+            android:layout_marginTop="@dimen/widget_vertical_margin">
+
+            <EditText android:id="@+id/email_edit_text"
+                android:textAppearance="?android:attr/textAppearanceMediumInverse"
+                android:textColor="@android:color/black"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textEmailAddress"
+                android:singleLine="true"
+                android:hint="@string/email_text"
+                android:textColorHint="@color/ControlText"
+                style="@style/AppTheme"
+                />
+        </LinearLayout>
+
+        <LinearLayout android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:paddingBottom="@dimen/widget_horizontal_margin"
+            android:layout_marginTop="@dimen/widget_vertical_margin">
+
+            <EditText android:id="@+id/password"
+                android:textAppearance="?android:attr/textAppearanceMediumInverse"
+                android:textColor="@android:color/black"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textPassword"
+                android:singleLine="false"
+                android:hint="@string/password_text"
+                android:textColorHint="@color/ControlText"
+                style="@style/AppTheme"
+                />
+        </LinearLayout>
+
+        <LinearLayout android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:paddingBottom="@dimen/widget_horizontal_margin"
+            android:layout_marginTop="@dimen/widget_vertical_margin">
+
+            <EditText android:id="@+id/confirm_password"
+                android:textAppearance="?android:attr/textAppearanceMediumInverse"
+                android:textColor="@android:color/black"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textPassword"
+                android:singleLine="true"
+                android:hint="@string/confirm_password_text"
+                android:textColorHint="@color/ControlText"
+                style="@style/AppTheme"
+                />
+
+
+        </LinearLayout>
+        <LinearLayout android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:paddingBottom="@dimen/widget_horizontal_margin"
+            android:layout_marginTop="@dimen/widget_vertical_margin">
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/image_view"
+                />
+        </LinearLayout>
+        ‏
+    </LinearLayout>
+</LinearLayout>

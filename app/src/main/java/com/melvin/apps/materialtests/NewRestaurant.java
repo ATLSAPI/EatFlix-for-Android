@@ -1,7 +1,9 @@
 package com.melvin.apps.materialtests;
 
 
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -16,7 +18,9 @@ import android.util.Base64;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.WindowManager;
+import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
@@ -60,9 +64,13 @@ public class NewRestaurant extends ActionBarActivity {
     String path;
     Bitmap bitmap;
 
+
     public static String image = "";
     EditText et1,et2,et3,et4,et5,et6,et7;
     Spinner sp1, sp2;
+
+    //AlertDialog initialise
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,6 +93,8 @@ public class NewRestaurant extends ActionBarActivity {
         et7 = (EditText) findViewById(R.id.town);
         sp1 = (Spinner) findViewById(R.id.type_spinner);
         sp2 = (Spinner) findViewById(R.id.type_cuisine);
+
+
     }
 
 
@@ -94,6 +104,7 @@ public class NewRestaurant extends ActionBarActivity {
         getMenuInflater().inflate(R.menu.menu_new_restaurant, menu);
         return true;
     }
+
     public String PostData(String username, String password) {
         InputStream inputStream;
         byte[] bytes;
@@ -109,20 +120,6 @@ public class NewRestaurant extends ActionBarActivity {
         String imagey = image;
         String cuisine_id = "1";
         String type_id ="1";
-//        int cuisine_id = (int) sp2.getSelectedItem();
-//        int type_id = (int) sp2.getSelectedItem();
-//        List<NameValuePair> name_value = new ArrayList<NameValuePair>();
-//        name_value.add(new BasicNameValuePair("name",name));
-//        name_value.add(new BasicNameValuePair("description",description));
-//        name_value.add(new BasicNameValuePair("address",address));
-//        name_value.add(new BasicNameValuePair("postcode", postcode));
-//        name_value.add(new BasicNameValuePair("town",town));
-//        name_value.add(new BasicNameValuePair("cuisine_id",cuisine_id));
-//        name_value.add(new BasicNameValuePair("type_id",type_id));
-//        name_value.add(new BasicNameValuePair("image",imagey));
-
-
-
         username = "email@example.com";
 
         password = "password";

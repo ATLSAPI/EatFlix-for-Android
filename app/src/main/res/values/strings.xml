@@ -43,27 +43,23 @@
         <item>Henry</item>
         <item>Schuster</item>
     </string-array>
-‏    <!--  -->
+‏                <!--  -->
 
-    <string name="login_header">Sign In</string>
-    <string name="registration_header">Register</string>
-    <string name="restaurant_detail_header">Restaurant Details</string>
     <string name="reviews_header">Reviews</string>
     <string name="profile_header">My Profile</string>
     <string name="restaurant_list_header">Restaurants Lists</string>
-    <string name="name_text">Name : John Javi Lee</string>
-    <string name="email_text">Email : jj_lee@gmail.com</string>
     <string name="password_text">Password</string>
     <string name="confirm_password_text">Confirm Password</string>
-    <string name="login_text">SIGN IN</string>
-    <string name="go_to_registration_text"> Don\'t have an account? Register</string>
-    <string name="register_text">ATTACH IMAGE</string>
+    <string name="first_name_text">First Name</string>
+    <string name="email_text">Email</string>
+    <string name="last_name_text">Last Name</string>
     <string name="go_to_login_text"> Already have an account? Login</string>
-    <string name="cancel_text">CANCEL</string>
     <string name="restaurant_registration_msg">Add Restaurant</string>
     <string name="town_hint">Town</string>
     <string name="desc_hint">Description</string>
     <string name="title_activity_splash">EatFlix</string>
-
+    <string name="title_activity_new_review">NewReviewActivity</string>
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="title_activity_register">Register</string>
 
 </resources>
