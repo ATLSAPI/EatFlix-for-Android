@@ -1,6 +1,9 @@
 package com.melvin.apps.materialtests;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -10,6 +13,8 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+
+import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
@@ -22,6 +27,7 @@ public class NavigationDrawerAdapter extends RecyclerView.Adapter<NavigationDraw
     private NavigationDrawerCallbacks mNavigationDrawerCallbacks;
     private int mSelectedPosition;
     private int mTouchedPosition = -1;
+    private SharedPreferences sharedPreferences;
 
     /**
      *
@@ -35,10 +41,11 @@ public class NavigationDrawerAdapter extends RecyclerView.Adapter<NavigationDraw
 //    private int mIcons[];       // Int Array to store the passed icons resource value from MainActivity.java
 
     private String name;        //String Resource for header View Name
-    private int profile;        //int Resource for header view profile picture
+    private String profile="";        //int Resource for header view profile picture
     private String email;       //String Resource for header view email‏
+    private int default_profile = R.drawable.default_profile;
 
-    public NavigationDrawerAdapter(List<NavigationItem> data, String Name, String Email, int Profile) {
+    public NavigationDrawerAdapter(List<NavigationItem> data, String Name, String Email, String Profile) {
         mData = data;
         name = Name;
         email = Email;
@@ -93,7 +100,15 @@ public class NavigationDrawerAdapter extends RecyclerView.Adapter<NavigationDraw
         }
         else{
 
-            viewHolder.profile.setImageResource(profile);           // Similarly we set the resources for header view
+            Uri uri = Uri.parse("http://timothysnw.co.uk/v1/users/" + profile + "/image");
+            if (profile.equals(""))
+            {
+                viewHolder.profile.setImageResource(default_profile);           // Similarly we set the resources for header view
+            }
+            else {
+                Picasso.with(viewHolder.profile.getContext()).load(uri)
+                        .into(viewHolder.profile);
+            }
             viewHolder.Name.setText(name);
             viewHolder.email.setText(email);
         }

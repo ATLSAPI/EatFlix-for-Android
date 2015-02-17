@@ -36,6 +36,7 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -44,6 +45,7 @@ import android.widget.Toast;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.SignInButton;
+import com.squareup.picasso.Picasso;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -57,6 +59,7 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.w3c.dom.Text;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -101,6 +104,9 @@ public class LoginActivity extends PlusBaseActivity implements LoaderCallbacks<C
     private LinearLayout login_layout;
     private TextView logout_btn;
     private ProgressDialog progressDialog;
+    private ImageView profile_pic;
+    private TextView profile_name;
+    private Context context;
 
     SharedPreferences sharedPreferences;
 
@@ -113,6 +119,9 @@ public class LoginActivity extends PlusBaseActivity implements LoaderCallbacks<C
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         sharedPreferences = getSharedPreferences("Auth",MODE_PRIVATE);
         progressDialog = new ProgressDialog(this);
+        profile_pic = (ImageView) findViewById(R.id.profile_pic);
+        profile_name = (TextView) findViewById(R.id.profile_name);
+        context = getApplicationContext();
 
 
         // Find the Google+ sign in button.
@@ -171,6 +180,10 @@ public class LoginActivity extends PlusBaseActivity implements LoaderCallbacks<C
             //User is logged in
             login_layout.removeViewAt(2);
             setTitle("Profile");
+            profile_name.setText(sharedPreferences.getString("name", ""));
+            Uri uri = Uri.parse("http://timothysnw.co.uk/v1/users/" + sharedPreferences.getString("id", "") + "/image");
+            Picasso.with(context).load(uri)
+                    .into(profile_pic);
             //Sign out
             logout_btn = (TextView) findViewById(R.id.logout);
             logout_btn.setOnClickListener(new OnClickListener() {
@@ -220,6 +233,7 @@ public class LoginActivity extends PlusBaseActivity implements LoaderCallbacks<C
         } else
             return true;
     }
+
     private class Logout extends AsyncTask<String,String, String>
     {
 
@@ -582,9 +596,12 @@ public class LoginActivity extends PlusBaseActivity implements LoaderCallbacks<C
                         editor.putString("token", jsonObject.getString("token"));
                         editor.putString("id", jsonObject.getString("id"));
                         editor.putString("device_id", jsonObject.getString("device_id"));
-                        editor.putString("device_id", jsonObject.getString("device_id"));
+                        editor.putString("name", jsonObject.getString("name"));
+                        editor.putString("username", username);
                         //editor.apply();
                         editor.commit();
+                        LoginActivity.this.finish();
+                        startActivity(getIntent());
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }

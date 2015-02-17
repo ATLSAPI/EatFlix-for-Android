@@ -8,9 +8,12 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.v4.app.NavUtils;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -75,7 +78,9 @@ public class RestaurantActivity extends BaseActivity {
     ProgressDialog pDialog;
     ArrayList<Restaurant> mItems;
     SharedPreferences sharedPreferences;
-    private AlertDialog.Builder alertDialog;
+    TextView error_tv, netfail;
+    private AlertDialog.Builder alertDialog, alertDialog2;
+    private SwipeRefreshLayout swipeRefreshLayout;
 
 
     @Override
@@ -91,6 +96,26 @@ public class RestaurantActivity extends BaseActivity {
         llm.setOrientation(LinearLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(llm);
         sharedPreferences = getSharedPreferences("Auth",MODE_PRIVATE);
+        netfail = (TextView) findViewById(R.id.net_fail);
+        swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.activity_restaurant_swipe_refresh_layout);
+
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                if (!isNetworkConnected()) {
+                    alertDialog2.show();
+                    swipeRefreshLayout.setRefreshing(false);
+                    netfail.setVisibility(View.VISIBLE);
+                    netfail.setText("No network detected. Pull down to refresh");
+                }
+                else {
+                    getRests hh = new getRests();
+                    hh.execute();
+                    swipeRefreshLayout.setRefreshing(false);
+                    netfail.setVisibility(View.INVISIBLE);
+                }
+            }
+        });
 
 
         SwipeableRecyclerViewTouchListener swipeTouchListener =
@@ -143,10 +168,31 @@ public class RestaurantActivity extends BaseActivity {
                     }
                 })
                 .setIcon(android.R.drawable.ic_dialog_alert);
+        alertDialog2 = new AlertDialog.Builder(this)
+                .setTitle("No network connection detected")
+                .setMessage("Retry?")
+                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        if (!isNetworkConnected()) {
+                            alertDialog2.show();
+                        }
+                    }
+                })
+                .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        netfail.setText("No network detected. Pull down to refresh");
+                    }
+                });
         try {
-            getRests hh = new getRests();
-            hh.execute("jjh","jhjh","hhi");
-            Toast.makeText(RestaurantActivity.this, "AM here1", Toast.LENGTH_LONG).show();
+            if (!isNetworkConnected()) {
+                alertDialog2.show();
+            }
+            else {
+                getRests hh = new getRests();
+                hh.execute();
+            }
 
         } catch (Exception e) {
             Toast.makeText(RestaurantActivity.this, e.toString(), Toast.LENGTH_LONG).show();
@@ -171,6 +217,20 @@ public class RestaurantActivity extends BaseActivity {
             //   Will be used when activity starts again.
             cache.flush();
         }
+    }
+    public boolean isNetworkConnected() {
+        NetworkInfo ni = null;
+        try {
+            ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+            ni = cm.getActiveNetworkInfo();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if (ni == null) {
+            // There are no active networks.
+            return false;
+        } else
+            return true;
     }
     private class getRests extends AsyncTask<String, String, String> {
         ArrayList<Restaurant> list = new ArrayList<Restaurant>();
@@ -337,7 +397,7 @@ public class RestaurantActivity extends BaseActivity {
         public void onBindViewHolder(RestaurantViewHolder contactViewHolder, int i) {
 
             Restaurant ci = contactList.get(i);
-            contactViewHolder.vName.setText(ci.restaurant);
+            //contactViewHolder.vName.setText(ci.restaurant);
 
             Uri uri = Uri.parse("http://timothysnw.co.uk/v1/restaurants/" + ci.id + "/image");
 
@@ -346,6 +406,23 @@ public class RestaurantActivity extends BaseActivity {
                 Context context = contactViewHolder.imageView.getContext();
                 Picasso.with(contactViewHolder.imageView.getContext()).load(uri)
                         .into(contactViewHolder.imageView);
+                contactViewHolder.toolbar.setTitle(ci.restaurant);
+                contactViewHolder.toolbar.setBackgroundColor(getResources().getColor(R.color.myPrimaryColor));
+                contactViewHolder.toolbar.setTitleTextColor(getResources().getColor(android.R.color.white));
+                if (contactViewHolder.toolbar != null) {
+                    // inflate your menu
+                    contactViewHolder.toolbar.inflateMenu(R.menu.menu_cardview);
+                    contactViewHolder.toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
+                        @Override
+                        public boolean onMenuItemClick(MenuItem menuItem) {
+                            if (menuItem.getItemId() == R.id.action_share) {
+
+                            }
+                            return true;
+                        }
+
+                    });
+                }
 
                 //new LoadImage(contactViewHolder.imageView).execute("http://timothysnw.co.uk/v1/restaurants/" + ci.id + "/image");
             } catch (NullPointerException e) {
@@ -369,6 +446,7 @@ public class RestaurantActivity extends BaseActivity {
         public class RestaurantViewHolder extends RecyclerView.ViewHolder {
             protected TextView vName;
             protected ImageView imageView;
+            protected Toolbar toolbar;
 //            protected TextView vEmail;
 //            protected TextView vTitle;
 
@@ -376,6 +454,8 @@ public class RestaurantActivity extends BaseActivity {
                 super(v);
                 vName =  (TextView) v.findViewById(R.id.restaurant_name);
                 imageView = (ImageView) v.findViewById(R.id.restaurant_image);
+                toolbar = (Toolbar) v.findViewById(R.id.card_toolbar);
+
 //                vSurname = (TextView)  v.findViewById(R.id.txtSurname);
 //                vEmail = (TextView)  v.findViewById(R.id.txtEmail);
 //                vTitle = (TextView) v.findViewById(R.id.title);

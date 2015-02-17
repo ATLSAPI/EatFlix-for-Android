@@ -2,21 +2,22 @@
 
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
       xmlns:app="http://schemas.android.com/apk/res-auto">
+    <!--<item-->
+        <!--android:id="@+id/search"-->
+        <!--android:orderInCategory="1"-->
+        <!--android:title="Share"-->
+        <!--android:actionProviderClass="android.widget.ShareActionProvider"-->
+        <!--android:actionViewClass="android.widget.SearchView"-->
+        <!--app:showAsAction="ifRoom|collapseActionView"-->
+        <!--/>-->
     <item
-        android:id="@+id/search"
-        android:orderInCategory="1"
-        android:title="Share"
-        android:actionProviderClass="android.widget.ShareActionProvider"
-        android:actionViewClass="android.widget.SearchView"
-        app:showAsAction="ifRoom|collapseActionView"
-        />
-    <item
-        android:id="@+id/searchview"
+        android:id="@+id/shaba"
         android:orderInCategory="1"
         android:icon="@drawable/abc_ic_search_api_mtrl_alpha"
         android:title=""
-        android:actionViewClass="android.widget.SearchView"
+        android:actionViewClass="android.support.v7.widget.SearchView"
         app:showAsAction="ifRoom|collapseActionView"
+
     />
     <!--<item-->
         <!--android:id="@+id/menu_search"-->

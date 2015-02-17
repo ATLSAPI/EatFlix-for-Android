@@ -21,10 +21,15 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:paddingTop="@dimen/activity_vertical_margin">
-
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/net_fail"
+            android:gravity="center"
+            android:textColor="@android:color/holo_red_dark"/>
 
     <android.support.v4.widget.SwipeRefreshLayout
-        android:id="@+id/activity_main_swipe_refresh_layout"
+        android:id="@+id/activity_restaurant_swipe_refresh_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
         <!--<TextView-->

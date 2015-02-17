@@ -2,8 +2,10 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.melvin.apps.materialtests.RegisterActivity">
-    <item android:id="@+id/add_restaurant" android:title="@string/add_restaurant" android:icon="@drawable/ic_attach_file_white_24dp"
+    <item android:id="@+id/take_photo" android:title="@string/attach_image" android:icon="@drawable/ic_camera_alt_white_36dp"
         android:orderInCategory="100" app:showAsAction="ifRoom" />
-    <item android:id="@+id/submit_restaurant" android:title="@string/add_restaurant"
-        android:orderInCategory="200" android:icon="@drawable/ic_send_white_24dp" app:showAsAction="always"/>
+    <item android:id="@+id/attach_image" android:title="@string/attach_image" android:icon="@drawable/ic_attach_file_white_24dp"
+        android:orderInCategory="200" app:showAsAction="ifRoom" />
+    <item android:id="@+id/submit_register" android:title="@string/register"
+        android:orderInCategory="300" android:icon="@drawable/ic_send_white_24dp" app:showAsAction="always"/>
 </menu>

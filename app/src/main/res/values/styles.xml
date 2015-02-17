@@ -1,7 +1,7 @@
 <resources>
 
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.NoActionBar">
+    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/myTextSecondaryColor</item>
         <item name="colorPrimaryDark">@color/myPrimaryDarkColor</item>
@@ -14,6 +14,7 @@
         <item name="android:editTextColor">@color/myNavigationColor</item>
         <item name="android:editTextBackground">@color/myTextSecondaryColor</item>
         <item name="drawerArrowStyle">@style/DrawerArrowStyle</item>
+        <item name="android:actionMenuTextColor">@android:color/white</item>
 
         <item name="android:windowBackground">@color/myWindowBackground</item>
     </style>

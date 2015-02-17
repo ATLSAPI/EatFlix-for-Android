@@ -33,6 +33,7 @@ import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListAdapter;
@@ -44,6 +45,8 @@ import android.widget.Toast;
 
 import android.view.View;
 
+
+import com.getbase.floatingactionbutton.FloatingActionButton;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -74,9 +77,13 @@ import java.io.InterruptedIOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.sql.Date;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 
@@ -246,14 +253,15 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerC
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main, menu);
 
-        // Associate searchable configuration with the SearchView
+//        Associate searchable configuration with the SearchView
 //        SearchManager searchManager =
 //                (SearchManager) getSystemService(Context.SEARCH_SERVICE);
 //        SearchView searchView =
-//                (SearchView) menu.findItem(R.id.search).getActionView();
+//                (SearchView) menu.findItem(R.id.shaba).getActionView();
 //        searchView.setSearchableInfo(
 //                searchManager.getSearchableInfo(getComponentName()));
-        return super.onCreateOptionsMenu(menu);
+//        searchView.setIconifiedByDefault(false);
+        return true;
     }
 
     @Override
@@ -296,13 +304,13 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerC
                             tempObject = new JSONObject(tempString);
                             list.add(new SingleRow(
                                     tempObject.getString("restaurant"),
-                                    tempObject.getString("cuisine"),
                                     tempObject.getString("type"),
+                                    tempObject.getString("cuisine"),
                                     tempObject.getString("created"),
-                                    tempObject.getString("modified"),
                                     tempObject.getString("description"),
-                                    //tempObject.getString("image"),
-                                    tempObject.getString("rating")));
+                                  //tempObject.getString("image"),
+                                    tempObject.getString("rating"),
+                                    tempObject.getString("first_name")));
                             reviews_id.add(tempObject.getInt("id"));
                        }
                     }
@@ -335,11 +343,8 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerC
         public String getData(String url) {
             try {
                 // Create a new HttpClient and Post Header
-//                String userCredentials = "email@example.com"+":"+"password";
-//                String ret="Basic "+Base64.encodeToString(userCredentials.getBytes(),Base64.URL_SAFE|Base64.NO_WRAP);
                 HttpClient httpclient = new DefaultHttpClient();
                 HttpGet httpget = new HttpGet(url);
-                //httpget.setHeader("Authorization",ret);
                 HttpResponse response = httpclient.execute(httpget);
 
                 int status = response.getStatusLine().getStatusCode();
@@ -441,23 +446,23 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerC
     {
         String restaurant;
         String type;
-        String postcode;
         String cuisine;
         String created;
         String description;
         String rating;
+        String first_name;
         //String image;
 
 
-        SingleRow(String restaurant, String type, String postcode, String cuisine, String created, String description, String rating)
+        SingleRow(String restaurant, String type, String cuisine, String created, String description, String rating, String first_name)
         {
             this.restaurant = restaurant;
             this.type = type;
-            this.postcode = postcode;
             this.cuisine = cuisine;
             this.created = created;
             this.rating = rating;
             this.description = description;
+            this.first_name= first_name;
             //this.image = image;
         }
 
@@ -495,21 +500,24 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerC
             return i;
         }
         class MyViewHolder {
-            TextView tv1, tv2, tv3, tv4, tv5, tv6;
+            TextView tv1, tv2, tv3, tv4, tv5, tv6, tv7;
             LinearLayout l1;
+            FloatingActionButton imageButton;
             RatingBar r1;
             MyViewHolder(View view)
             {
                 ///Instantiate views here....
                 //tv1 = (TextView) view.findViewById(R.id.header);
                 tv2 = (TextView) view.findViewById(R.id.restaurant);
-                tv3 = (TextView) view.findViewById(R.id.type);
+                tv3 = (TextView) view.findViewById(R.id.type_field);
                 tv4 = (TextView) view.findViewById(R.id.created);
                 tv5 = (TextView) view.findViewById(R.id.description);
-                tv6 = (TextView) view.findViewById(R.id.cuisine);
+                tv6 = (TextView) view.findViewById(R.id.cuisine_field);
+                tv7 = (TextView) view.findViewById(R.id.name);
                 r1 = (RatingBar) view.findViewById(R.id.rating);
+                imageButton = (FloatingActionButton) view.findViewById(R.id.share);
                 //l1 = (LinearLayout) findViewById(R.id.background);
-                r1.isInEditMode();
+
             }
         }
         @Override
@@ -533,14 +541,34 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerC
 
             ///Set here....
             SingleRow temp = list.get(i);
-
+//            DateFormat format = new SimpleDateFormat("d/m/YY", Locale.ENGLISH);
+//            try {
+//                java.util.Date date = format.parse(temp.created);
+//            } catch (ParseException e) {
+//                e.printStackTrace();
+//            }
             //holder.tv1.setText(temp.restaurant);
+            final String desc = temp.description;
             holder.tv2.setText(temp.restaurant);
             holder.tv3.setText(temp.type);
             holder.tv4.setText(temp.created);
             holder.tv5.setText(temp.description);
             holder.tv6.setText(temp.cuisine);
+            holder.tv7.setText(temp.first_name);
             holder.r1.setRating(Integer.parseInt(temp.rating));
+            holder.r1.setClickable(false);
+            holder.r1.setFocusable(false);
+            holder.r1.setIsIndicator(false);
+            holder.imageButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent sendIntent = new Intent();
+                    sendIntent.setAction(Intent.ACTION_SEND);
+                    sendIntent.putExtra(Intent.EXTRA_TEXT, desc);
+                    sendIntent.setType("text/plain");
+                    startActivity(Intent.createChooser(sendIntent, getResources().getText(R.string.sendto)));
+                }
+            });
 
 //            try {
 //                File imagefile = new File(temp.image);

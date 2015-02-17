@@ -8,14 +8,19 @@
     android:padding="10dp"
     card_view:cardCornerRadius="2dp"
     android:layout_margin="5dp">
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/card_toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:background="@android:color/white"/>
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/myPrimaryColor"
             android:padding="5dp">
             <TextView
                 android:layout_height="wrap_content"

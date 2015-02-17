@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -63,6 +64,7 @@ public class NewRestaurant extends ActionBarActivity {
     ProgressDialog progress, progress2;
     String path;
     Bitmap bitmap;
+    private SharedPreferences sharedPreferences;
 
 
     public static String image = "";
@@ -93,6 +95,7 @@ public class NewRestaurant extends ActionBarActivity {
         et7 = (EditText) findViewById(R.id.town);
         sp1 = (Spinner) findViewById(R.id.type_spinner);
         sp2 = (Spinner) findViewById(R.id.type_cuisine);
+        sharedPreferences = getSharedPreferences("Auth", MODE_PRIVATE);
 
 
     }
@@ -140,17 +143,8 @@ public class NewRestaurant extends ActionBarActivity {
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
-
-
-            //inputStream = new FileInputStream(new File(imagePath));
-
-//                ByteArrayOutputStream bos = new ByteArrayOutputStream();
-//                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bos);
-//                bytes = IOUtils.toByteArray(inputStream);
-//                InputStreamBody inputStreamBody = new InputStreamBody(new ByteArrayInputStream(bytes), fileName);
-
-                multipartEntity.addPart("file", new FileBody(new File(imagePath)));
-                httpPost.setEntity(multipartEntity);
+            multipartEntity.addPart("file", new FileBody(new File(imagePath)));
+            httpPost.setEntity(multipartEntity);
 
 
 

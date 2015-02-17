@@ -130,8 +130,7 @@
                 <de.hdodenhof.circleimageview.CircleImageView
                     android:layout_width="100dp"
                     android:layout_height="100dp"
-                    android:id="@+id/profile_pic"
-                    android:src="@drawable/aka"/>
+                    android:id="@+id/profile_pic"/>
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -145,7 +144,6 @@
                     android:id="@+id/profile_name"
                     android:gravity="center_horizontal"
                     android:textSize="20sp"
-                    android:text="MELVIN IWUAJOKU"
                     android:textColor="@color/ControlText"
                     android:textStyle="bold"/>
                 <TextView

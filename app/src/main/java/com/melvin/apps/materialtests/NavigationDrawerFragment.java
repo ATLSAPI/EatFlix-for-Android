@@ -35,9 +35,10 @@ public class NavigationDrawerFragment extends Fragment implements NavigationDraw
     private boolean mUserLearnedDrawer;
     private boolean mFromSavedInstanceState;
     private int mCurrentSelectedPosition;
-    String NAME = "Melvin Iwuajoku";
-    String EMAIL = "mconi2007@gmail.com";
-    int PROFILE = R.drawable.aka;
+    String NAME = "Anonymous";
+    String EMAIL = "Not Logged in";
+    String PROFILE = "";
+    SharedPreferences sharedPreferences;
 
     @Nullable
     @Override
@@ -48,6 +49,14 @@ public class NavigationDrawerFragment extends Fragment implements NavigationDraw
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         mDrawerList.setLayoutManager(layoutManager);
         mDrawerList.setHasFixedSize(true);
+        sharedPreferences = this.getActivity().getSharedPreferences("Auth",Context.MODE_PRIVATE);
+        if (sharedPreferences.contains("token") && sharedPreferences.contains("id") && sharedPreferences.contains("device_id"))
+        {
+            NAME = sharedPreferences.getString("name","");
+            EMAIL = sharedPreferences.getString("username", "");
+            PROFILE = sharedPreferences.getString("id", "");
+        }
+        //
 
         final List<NavigationItem> navigationItems = getMenu();
         NavigationDrawerAdapter adapter = new NavigationDrawerAdapter(navigationItems, NAME ,EMAIL, PROFILE);
