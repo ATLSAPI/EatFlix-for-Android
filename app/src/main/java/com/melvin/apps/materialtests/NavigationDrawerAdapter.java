@@ -43,7 +43,7 @@ public class NavigationDrawerAdapter extends RecyclerView.Adapter<NavigationDraw
     private String name;        //String Resource for header View Name
     private String profile="";        //int Resource for header view profile picture
     private String email;       //String Resource for header view email‏
-    private int default_profile = R.drawable.default_profile;
+    private int default_profile = R.drawable.default_profile; //Default drawable resource (for user not logged in)
 
     public NavigationDrawerAdapter(List<NavigationItem> data, String Name, String Email, String Profile) {
         mData = data;

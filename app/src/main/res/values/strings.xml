@@ -47,6 +47,7 @@
 
     <string name="reviews_header">Reviews</string>
     <string name="profile_header">My Profile</string>
+    <string name="account_header">My Account</string>
     <string name="restaurant_list_header">Restaurants Lists</string>
     <string name="password_text">Password</string>
     <string name="confirm_password_text">Confirm Password</string>
@@ -65,5 +66,6 @@
     <string name="attach_image">Attach Image</string>
     <string name="register">Register</string>
     <string name="sendto">Share with</string>
+    <string name="details">Enter you review here</string>
 
 </resources>

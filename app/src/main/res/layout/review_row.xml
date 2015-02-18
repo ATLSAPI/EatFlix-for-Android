@@ -25,7 +25,6 @@
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:id="@+id/profile_pic"
-            android:src="@drawable/default_profile"
             android:paddingRight="15dp"/>
         <TextView android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -126,7 +125,9 @@
         android:id="@+id/description"
         android:textColor="@color/ControlText"
         android:textSize="15sp"
-        android:padding="5dp"/>
+        android:paddingTop="5dp"
+        android:paddingRight="5dp"
+        android:paddingBottom="5dp"/>
         </LinearLayout>
     <LinearLayout
         android:layout_width="match_parent"

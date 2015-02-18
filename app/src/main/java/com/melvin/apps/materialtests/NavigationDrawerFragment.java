@@ -162,6 +162,11 @@ public class NavigationDrawerFragment extends Fragment implements NavigationDraw
         //mCurrentSelectedPosition = position;
         Intent intent;
         switch (position) {
+            case 0:
+//                intent = new Intent(getActivity(), LoginActivity.class);
+//                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+//                getActivity().startActivity(intent);
+                break;
             case 2:
                 intent = new Intent(getActivity(), RestaurantActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);

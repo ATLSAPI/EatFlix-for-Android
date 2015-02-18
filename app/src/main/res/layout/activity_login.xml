@@ -112,7 +112,7 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textSize="20sp"
+                    android:textSize="12sp"
                     android:textColor="@color/ControlText"
                     android:text="@string/profile_header"
                     android:textAllCaps="true"
@@ -154,10 +154,29 @@
                     android:id="@+id/profile_email"
                     android:gravity="center_horizontal"
                     android:textSize="15sp"
-                    android:text="mconi2007@gmail.com"
                     android:textColor="@color/ControlText"
                     android:textStyle="bold"/>
                 </LinearLayout>
+                </LinearLayout>
+                <!--<TextView-->
+                    <!--android:layout_width="match_parent"-->
+                    <!--android:layout_height="2dp"-->
+                    <!--android:background="@color/ControlText"/>-->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="@dimen/profile_pic"
+                    android:paddingRight="@dimen/profile_pic"
+                    android:paddingBottom="@dimen/profile_pic"
+                    android:paddingTop="@dimen/padding">
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textSize="12sp"
+                        android:textColor="@color/ControlText"
+                        android:text="@string/account_header"
+                        android:textAllCaps="true"
+                        />
                 </LinearLayout>
                 <TextView
                     android:layout_width="match_parent"
@@ -166,19 +185,23 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:padding="@dimen/profile_pic">
+                    android:padding="@dimen/profile_pic"
+                    android:paddingBottom="15dp">
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:textSize="20sp"
                         android:textColor="@color/ControlText"
                         android:text="@string/logout"
-                        android:textAllCaps="true"
                         android:id="@+id/logout"
                         android:clickable="true"
+                        android:paddingRight="@dimen/padding"
+                        android:paddingTop="@dimen/padding"
+                        android:paddingBottom="@dimen/padding"
+                        android:background="@drawable/row"
                         />
                 </LinearLayout>
-            </LinearLayout>
+                </LinearLayout>
         </android.support.v7.widget.CardView>
 
         </ScrollView>

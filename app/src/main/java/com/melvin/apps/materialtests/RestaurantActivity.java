@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -81,6 +82,7 @@ public class RestaurantActivity extends BaseActivity {
     TextView error_tv, netfail;
     private AlertDialog.Builder alertDialog, alertDialog2;
     private SwipeRefreshLayout swipeRefreshLayout;
+    private int color=0;
 
 
     @Override
@@ -98,6 +100,14 @@ public class RestaurantActivity extends BaseActivity {
         sharedPreferences = getSharedPreferences("Auth",MODE_PRIVATE);
         netfail = (TextView) findViewById(R.id.net_fail);
         swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.activity_restaurant_swipe_refresh_layout);
+        progressDialog = new ProgressDialog(this);
+
+        AdapterView.OnItemClickListener t1 = new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                Toast.makeText(RestaurantActivity.this, "AM here" + "" + restaurant_id.get(i), Toast.LENGTH_LONG).show();
+            }
+        };
 
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -148,7 +158,7 @@ public class RestaurantActivity extends BaseActivity {
         recyclerView.addOnItemTouchListener(swipeTouchListener);
 
         //Initialise Http cache
-        initialiseCache();
+        //initialiseCache();
 
         //AlertDialog
         //AlertDialog
@@ -190,8 +200,11 @@ public class RestaurantActivity extends BaseActivity {
                 alertDialog2.show();
             }
             else {
-                getRests hh = new getRests();
-                hh.execute();
+                progressDialog.setTitle("Loading");
+                progressDialog.setMessage("Loading restaurants...");
+                progressDialog.show();
+                getRests objAsync = new getRests();
+                objAsync.execute();
             }
 
         } catch (Exception e) {
@@ -199,6 +212,9 @@ public class RestaurantActivity extends BaseActivity {
             e.printStackTrace();
         }
     }
+    /*
+    Cache for Http connections
+     */
     public void initialiseCache()
     {
         File httpCacheDir = getExternalCacheDir();
@@ -254,8 +270,10 @@ public class RestaurantActivity extends BaseActivity {
                                 tempObject.getString("town"),
                                 tempObject.getString("type"),
                                 tempObject.getString("id"),
-                                tempObject.getString("cuisine")));
-                        //restaurant_id.add(tempObject.getInt("id"));
+                                tempObject.getString("cuisine"),
+                                tempObject.getString("reviewed"),
+                                tempObject.getString("average")));
+                        restaurant_id.add(tempObject.getInt("id"));
                     }
                 }
             } catch (JSONException e) {
@@ -272,6 +290,7 @@ public class RestaurantActivity extends BaseActivity {
                 restaurantAdapter = new ViewRestaurantAdapter(list);
                 recyclerView.setAdapter(restaurantAdapter);
                 restaurantAdapter.notifyDataSetChanged();
+                progressDialog.dismiss();
 
             } catch (Exception e) {
                 Toast.makeText(RestaurantActivity.this, e.toString(), Toast.LENGTH_LONG).show();
@@ -333,10 +352,12 @@ public class RestaurantActivity extends BaseActivity {
         String type;
         String postcode;
         String cuisine;
+        String reviewed;
+        String average;
                 //String description;
 
 
-         Restaurant(String restaurant, String address,String postcode,String town,String type,String id,String cuisine)
+         Restaurant(String restaurant, String address,String postcode,String town,String type,String id,String cuisine, String reviewed, String average)
         {
             this.restaurant = restaurant;
             this.type = type;
@@ -345,6 +366,8 @@ public class RestaurantActivity extends BaseActivity {
             this.address = address;
             this.town = town;
             this.id = id;
+            this.reviewed = reviewed;
+            this.average = average;
         }
 
     }
@@ -397,26 +420,41 @@ public class RestaurantActivity extends BaseActivity {
         public void onBindViewHolder(RestaurantViewHolder contactViewHolder, int i) {
 
             Restaurant ci = contactList.get(i);
-            //contactViewHolder.vName.setText(ci.restaurant);
+            contactViewHolder.vName.setText(ci.cuisine+" cuisine");
 
             Uri uri = Uri.parse("http://timothysnw.co.uk/v1/restaurants/" + ci.id + "/image");
-
+            /*
+            */
+//            new Shuffle().execute("http://timothysnw.co.uk/v1/restaurants/" + ci.id + "/image");
+//            contactViewHolder.toolbar.setBackgroundColor(color);
+            /*
+             */
             try {
                 contactViewHolder.imageView.setImageBitmap(null);
                 Context context = contactViewHolder.imageView.getContext();
                 Picasso.with(contactViewHolder.imageView.getContext()).load(uri)
                         .into(contactViewHolder.imageView);
-                contactViewHolder.toolbar.setTitle(ci.restaurant);
-                contactViewHolder.toolbar.setBackgroundColor(getResources().getColor(R.color.myPrimaryColor));
-                contactViewHolder.toolbar.setTitleTextColor(getResources().getColor(android.R.color.white));
+                contactViewHolder.toolbar.setTitle(ci.restaurant+" "+ci.town);
+                //contactViewHolder.toolbar.setBackgroundColor(getResources().getColor(R.color.myPrimaryColor));
+                contactViewHolder.toolbar.setTitleTextColor(getResources().getColor(R.color.ControlText));
                 if (contactViewHolder.toolbar != null) {
                     // inflate your menu
                     contactViewHolder.toolbar.inflateMenu(R.menu.menu_cardview);
+                    contactViewHolder.toolbar.getMenu().findItem(R.id.action_share).setTitle(ci.id);
+                    contactViewHolder.toolbar.getMenu().findItem(R.id.action_add).setTitle(ci.id);
+                    contactViewHolder.toolbar.getMenu().findItem(R.id.action_delete).setTitle(ci.id);
                     contactViewHolder.toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
                         @Override
                         public boolean onMenuItemClick(MenuItem menuItem) {
                             if (menuItem.getItemId() == R.id.action_share) {
+                                //menuItem
+                                Toast.makeText(RestaurantActivity.this, menuItem.getTitle() + "", Toast.LENGTH_LONG).show();
+                            } else if (menuItem.getItemId() == R.id.action_delete) {
 
+                            } else if (menuItem.getItemId() == R.id.action_add) {
+                                Intent intent = new Intent(RestaurantActivity.this, NewReviewActivity.class);
+                                intent.putExtra("id", menuItem.getTitle());
+                                startActivity(intent);
                             }
                             return true;
                         }
@@ -424,13 +462,15 @@ public class RestaurantActivity extends BaseActivity {
                     });
                 }
 
+
                 //new LoadImage(contactViewHolder.imageView).execute("http://timothysnw.co.uk/v1/restaurants/" + ci.id + "/image");
             } catch (NullPointerException e) {
                 e.printStackTrace();
             }
-//            contactViewHolder.vSurname.setText(ci.surname);
-//            contactViewHolder.vEmail.setText(ci.email);
-//            contactViewHolder.vTitle.setText(ci.name + " " + ci.surname);
+            float percent = Float.parseFloat(ci.average)/5 * 100;
+            contactViewHolder.average.setText(Math.round(percent)+"%");
+            contactViewHolder.number.setText(ci.reviewed+" reviews");
+            //contactViewHolder.vTitle.setText(ci.name + " " + ci.surname);
 
         }
 
@@ -447,21 +487,62 @@ public class RestaurantActivity extends BaseActivity {
             protected TextView vName;
             protected ImageView imageView;
             protected Toolbar toolbar;
-//            protected TextView vEmail;
-//            protected TextView vTitle;
+            protected TextView average;
+            protected TextView number;
 
             public RestaurantViewHolder(View v) {
                 super(v);
                 vName =  (TextView) v.findViewById(R.id.restaurant_name);
                 imageView = (ImageView) v.findViewById(R.id.restaurant_image);
+                //imageView.setAlpha(65);
                 toolbar = (Toolbar) v.findViewById(R.id.card_toolbar);
 
-//                vSurname = (TextView)  v.findViewById(R.id.txtSurname);
-//                vEmail = (TextView)  v.findViewById(R.id.txtEmail);
-//                vTitle = (TextView) v.findViewById(R.id.title);
+                average = (TextView)  v.findViewById(R.id.average_reviews);
+                number = (TextView)  v.findViewById(R.id.reviews_num);
+                //vTitle = (TextView) v.findViewById(R.id.title);
 
 
             }
+        }
+    }
+    private class Shuffle extends AsyncTask<String, String, String>{
+
+        @Override
+        protected String doInBackground(String... strings) {
+            Bitmap bitmap1;
+            Uri uri = Uri.parse(strings[0]);
+            int jb =0;
+            try {
+                bitmap1 = Picasso.with(getApplicationContext()).load(uri)
+                        .get();
+                Bitmap bitmap = bitmap1; //assign your bitmap here
+                int redColors = 0;
+                int greenColors = 0;
+                int blueColors = 0;
+                int pixelCount = 0;
+
+                for (int y = 0; y < bitmap.getHeight(); y++)
+                {
+                    for (int x = 0; x < bitmap.getWidth(); x++)
+                    {
+                        int c = bitmap.getPixel(x, y);
+                        pixelCount++;
+                        redColors += Color.red(c);
+                        greenColors += Color.green(c);
+                        blueColors += Color.blue(c);
+                    }
+                }
+                // calculate average of bitmap r,g,b values
+                int red = (redColors/pixelCount);
+                int green = (greenColors/pixelCount);
+                int blue = (blueColors/pixelCount);
+                jb = Color.rgb(red, green, blue);
+                color = jb;
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return jb+"";
         }
     }
 
@@ -496,14 +577,9 @@ public class RestaurantActivity extends BaseActivity {
                 //Toast.makeText(RestaurantActivity.this, "Image Does Not exist or Network Error", Toast.LENGTH_SHORT).show();
             }
         }
+
+
     }
-
-
-
-
-
-
-
 
 
 }

@@ -12,6 +12,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.net.http.HttpResponseCache;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -47,6 +48,7 @@ import android.view.View;
 
 
 import com.getbase.floatingactionbutton.FloatingActionButton;
+import com.squareup.picasso.Picasso;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -86,28 +88,30 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import de.hdodenhof.circleimageview.CircleImageView;
+
 
 public class MainActivity extends ActionBarActivity implements NavigationDrawerCallbacks {
 
     private Toolbar mToolbar;
-    ArrayList<Integer> reviews_id = new ArrayList<Integer>();
+    private ArrayList<Integer> reviews_id = new ArrayList<Integer>();
     private NavigationDrawerFragment mNavigationDrawerFragment;
-    ListView lv1;
-    ArrayAdapter<String> adapter;
+    private ListView lv1;
+    private ArrayAdapter<String> adapter;
 
     private static final String DEBUG_TAG = "HttpExample";
     private EditText urlText;
     private TextView textView;
     public final static String apiURL = "http://www.cheesejedi.com/rest_services/get_big_cheese.php?puzzle=1";
     public static final String TAG = MainActivity.class.getSimpleName();
-    ListAdapter mAdapter;
-    ReviewAdapter reviewAdapter;
-    ListView listView;
-    TextView error_tv, netfail;
-    Context context;
-    SwipeRefreshLayout swipeRefreshLayout;
-    ProgressDialog progressBar;
-    SharedPreferences sharedPreferences;
+    private ListAdapter mAdapter;
+    private ReviewAdapter reviewAdapter;
+    private ListView listView;
+    private TextView error_tv, netfail;
+    private Context context;
+    private SwipeRefreshLayout swipeRefreshLayout;
+    private ProgressDialog progressBar;
+    private SharedPreferences sharedPreferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -123,21 +127,24 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerC
         netfail = (TextView) findViewById(R.id.net_fail);
         progressBar = new ProgressDialog(this);
         sharedPreferences = getSharedPreferences("Auth",MODE_PRIVATE);
-        //initialiseCache();
+
+        //RefreshListener for Swipe refresh layout
         swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.activity_main_swipe_refresh_layout);
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener(){
 
             @Override
             public void onRefresh() {
-                //listView.setAdapter(reviewAdapter);
-
+                //On swipe refresh pull down, reload data from server
                 LongRunningGetIO longRunningGetIO = new LongRunningGetIO();
                 longRunningGetIO.execute("reviews_get", "get");
                 swipeRefreshLayout.setRefreshing(false);
             }
         });
+
+        //initialiseCache() to speed up subsequent connections
+        initialiseCache();
         /**
-         * Check internet connection first
+         * Check internet connection before retrieving data
          */
         boolean check =  isNetworkConnected();
 
@@ -252,15 +259,6 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerC
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main, menu);
-
-//        Associate searchable configuration with the SearchView
-//        SearchManager searchManager =
-//                (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-//        SearchView searchView =
-//                (SearchView) menu.findItem(R.id.shaba).getActionView();
-//        searchView.setSearchableInfo(
-//                searchManager.getSearchableInfo(getComponentName()));
-//        searchView.setIconifiedByDefault(false);
         return true;
     }
 
@@ -310,7 +308,8 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerC
                                     tempObject.getString("description"),
                                   //tempObject.getString("image"),
                                     tempObject.getString("rating"),
-                                    tempObject.getString("first_name")));
+                                    tempObject.getString("first_name"),
+                                    tempObject.getString("user_id")));
                             reviews_id.add(tempObject.getInt("id"));
                        }
                     }
@@ -404,27 +403,6 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerC
 
         public String prepareData(){
             String json="";
-//            String review = review_et.getText().toString();
-//            String rating = rating_et.getText().toString();
-//            int rate = Integer.parseInt(rating);
-//            Date date = new Date();
-//            DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-//            String today = dateFormat.format(date);
-//            DateFormat timeFormat = new SimpleDateFormat("HH:mm:ss");
-//            String thisMoment = timeFormat.format(date);
-//            try {
-//                JSONObject jsonObject = new JSONObject();
-//                jsonObject.accumulate("review", review);
-//                jsonObject.accumulate("rating", rate);
-//                jsonObject.accumulate("review_date", today);
-//                jsonObject.accumulate("review_time", thisMoment);
-//                jsonObject.accumulate("restaurants_id", restaurantsId);
-//                json = jsonObject.toString();
-//                return json;
-//            }
-//            catch (JSONException e){
-//                e.printStackTrace();
-//            }
            return json;
         }
 
@@ -451,10 +429,10 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerC
         String description;
         String rating;
         String first_name;
-        //String image;
+        String id;
 
 
-        SingleRow(String restaurant, String type, String cuisine, String created, String description, String rating, String first_name)
+        SingleRow(String restaurant, String type, String cuisine, String created, String description, String rating, String first_name, String id)
         {
             this.restaurant = restaurant;
             this.type = type;
@@ -463,7 +441,7 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerC
             this.rating = rating;
             this.description = description;
             this.first_name= first_name;
-            //this.image = image;
+            this.id = id;
         }
 
     }
@@ -504,6 +482,7 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerC
             LinearLayout l1;
             FloatingActionButton imageButton;
             RatingBar r1;
+            CircleImageView circleImageView;
             MyViewHolder(View view)
             {
                 ///Instantiate views here....
@@ -516,6 +495,7 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerC
                 tv7 = (TextView) view.findViewById(R.id.name);
                 r1 = (RatingBar) view.findViewById(R.id.rating);
                 imageButton = (FloatingActionButton) view.findViewById(R.id.share);
+                circleImageView = (CircleImageView) view.findViewById(R.id.profile_pic);
                 //l1 = (LinearLayout) findViewById(R.id.background);
 
             }
@@ -538,20 +518,24 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerC
             }
 
 
-
+            Context context2 = holder.circleImageView.getContext();
             ///Set here....
+            String outputDate = "";
             SingleRow temp = list.get(i);
-//            DateFormat format = new SimpleDateFormat("d/m/YY", Locale.ENGLISH);
-//            try {
-//                java.util.Date date = format.parse(temp.created);
-//            } catch (ParseException e) {
-//                e.printStackTrace();
-//            }
+            DateFormat format = new SimpleDateFormat("dd/MM/yyyy", Locale.ENGLISH);
+            DateFormat outputFormat = new SimpleDateFormat("MMM dd, yyyy", Locale.ENGLISH);
+            try {
+                java.util.Date date = format.parse(temp.created);
+                outputDate = outputFormat.format(date);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+
             //holder.tv1.setText(temp.restaurant);
             final String desc = temp.description;
             holder.tv2.setText(temp.restaurant);
             holder.tv3.setText(temp.type);
-            holder.tv4.setText(temp.created);
+            holder.tv4.setText(outputDate);
             holder.tv5.setText(temp.description);
             holder.tv6.setText(temp.cuisine);
             holder.tv7.setText(temp.first_name);
@@ -559,6 +543,12 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerC
             holder.r1.setClickable(false);
             holder.r1.setFocusable(false);
             holder.r1.setIsIndicator(false);
+            Uri uri = Uri.parse("http://timothysnw.co.uk/v1/users/"+temp.id+"/image");
+            Picasso.with(context2).load(uri)
+                    .into(holder.circleImageView);
+
+
+            // Share button handler
             holder.imageButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {

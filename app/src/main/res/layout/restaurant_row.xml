@@ -2,60 +2,87 @@
 <android.support.v7.widget.CardView
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/card_view"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="10dp"
     card_view:cardCornerRadius="2dp"
-    android:layout_margin="5dp">
-
-    <LinearLayout
+    android:layout_margin="5dp"
+    android:background="@drawable/button">
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/card_toolbar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
-        <android.support.v7.widget.Toolbar
-            android:id="@+id/card_toolbar"
+        android:layout_height="60dp"/>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <ImageView
+            android:layout_height="match_parent"
             android:layout_width="match_parent"
-            android:layout_height="60dp"
-            android:background="@android:color/white"/>
+            android:id="@+id/restaurant_image"
+            android:scaleType="centerCrop"
+            android:layout_alignParentTop="true"
+            android:layout_marginTop="60dp"
+            tools:ignore="ContentDescription"
+            android:layout_centerHorizontal="true"/>
         <LinearLayout
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:padding="5dp">
+            android:padding="5dp"
+            android:background="@android:color/holo_orange_light"
+            android:layout_marginTop="70dp"
+            android:layout_marginRight="10dp"
+            android:layout_alignParentRight="true">
             <TextView
                 android:layout_height="wrap_content"
                 android:layout_width="match_parent"
                 android:textColor="@android:color/white"
-                android:textSize="30sp"
+                android:textSize="25sp"
+                android:id="@+id/average_reviews"/>
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_alignParentBottom="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="5dp"
+            android:id="@+id/linearLayout"
+            android:background="#80000000">
+            <TextView
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:textColor="@android:color/white"
+                android:textSize="25sp"
                 android:id="@+id/restaurant_name"/>
         </LinearLayout>
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-        <ImageView
-            android:layout_height="wrap_content"
-            android:layout_width="match_parent"
-            android:id="@+id/restaurant_image"/>
-    </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:padding="5dp"
+        android:background="#80000000">
     <TextView
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
-        android:textColor="@color/material_blue_grey_800"
-        android:textSize="30sp"
+        android:textColor="@android:color/white"
+        android:textSize="20sp"
         android:id="@+id/reviews_num"/>
-        <TextView
-            android:layout_height="wrap_content"
-            android:layout_width="match_parent"
-            android:textColor="@color/material_blue_grey_800"
-            android:textSize="30sp"
-            android:id="@+id/review"/>
+        <!--<TextView-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:textColor="@color/material_blue_grey_800"-->
+            <!--android:textSize="30sp"-->
+            <!--android:id="@+id/review"/>-->
     </LinearLayout>
+        </LinearLayout>
 
-    </LinearLayout>
+    </RelativeLayout>
 
 </android.support.v7.widget.CardView>

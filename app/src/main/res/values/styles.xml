@@ -18,6 +18,11 @@
 
         <item name="android:windowBackground">@color/myWindowBackground</item>
     </style>
+    <style name="AppTheme.Rating" parent="@android:style/Widget.RatingBar">
+        <item name="colorControlNormal">@android:color/holo_green_light</item>
+        <item name="colorControlActivated">@android:color/holo_green_light</item>
+        <item name="colorControlHighlight">@android:color/holo_green_light</item>
+        </style>
     <style name="AppTheme.Dialog" parent="Base.Theme.AppCompat.Light.DialogWhenLarge">
         <!--<item name="background">@android:color/holo_blue_bright</item>-->
         <!--<item name="android:background">@android:color/holo_blue_bright</item>-->

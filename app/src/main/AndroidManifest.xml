@@ -98,6 +98,9 @@
         <activity
             android:name=".NewReviewActivity"
             android:label="@string/title_activity_new_review"
+            android:theme="@style/AppTheme"
+            android:configChanges="orientation|screenSize"
+            android:windowSoftInputMode="stateHidden|adjustPan"
             android:parentActivityName=".RestaurantActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"

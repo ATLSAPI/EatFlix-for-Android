@@ -123,15 +123,11 @@ public class NewRestaurant extends ActionBarActivity {
         String imagey = image;
         String cuisine_id = "1";
         String type_id ="1";
-        username = "email@example.com";
-
-        password = "password";
-        String userCredentials = username+":"+password;
-        String ret= "Basic "+ Base64.encodeToString(userCredentials.getBytes(), Base64.URL_SAFE | Base64.NO_WRAP);
+        String token = sharedPreferences.getString("token", "");
         String url = "http://timothysnw.co.uk/v1/restaurants";
         HttpClient httpclient = new DefaultHttpClient();
         HttpPost httpPost = new HttpPost(url);
-        httpPost.setHeader("Authorization", ret);
+        httpPost.setHeader("Token", token);
         try {
             multipartEntity.addPart("name", new StringBody(name));
             multipartEntity.addPart("description",new StringBody(description));
@@ -171,6 +167,7 @@ public class NewRestaurant extends ActionBarActivity {
             HttpEntity entity = response.getEntity();
             try {
                 data = EntityUtils.toString(entity);
+                //data = status+"";
                 //fail
             } catch (IOException e) {
                 e.printStackTrace();
@@ -195,6 +192,10 @@ public class NewRestaurant extends ActionBarActivity {
                 Toast.makeText(NewRestaurant.this, "Restaurant added!", Toast.LENGTH_LONG).show();
                 intent = new Intent(NewRestaurant.this, RestaurantActivity.class);
                 startActivity(intent);
+            }
+            else
+            {
+                Toast.makeText(NewRestaurant.this, s, Toast.LENGTH_LONG).show();
             }
             super.onPostExecute(s);
         }

@@ -78,11 +78,8 @@ import java.util.List;
  */
 public class LoginActivity extends PlusBaseActivity implements LoaderCallbacks<Cursor> {
 
-    /**
-     * A dummy authentication store containing known user names and passwords.
-     * TODO: remove after connecting to a real authentication system.
-     */
-    String auth;
+
+
     private static final String[] DUMMY_CREDENTIALS = new String[]{
             "foo@example.com:hello", "bar@example.com:world"
     };
@@ -105,22 +102,33 @@ public class LoginActivity extends PlusBaseActivity implements LoaderCallbacks<C
     private TextView logout_btn;
     private ProgressDialog progressDialog;
     private ImageView profile_pic;
-    private TextView profile_name;
+    private TextView profile_name, profile_email;
     private Context context;
 
-    SharedPreferences sharedPreferences;
+    //Variables for shared preferences
+    private String auth;
+    private SharedPreferences sharedPreferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+
+        //Instantiate Toolbar and set to layout
         mToolbar = (Toolbar) findViewById(R.id.toolbar_actionbar);
         setSupportActionBar(mToolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        //Instantiate shared preference
         sharedPreferences = getSharedPreferences("Auth",MODE_PRIVATE);
+
+        //Instantiate widgets and variables
         progressDialog = new ProgressDialog(this);
         profile_pic = (ImageView) findViewById(R.id.profile_pic);
         profile_name = (TextView) findViewById(R.id.profile_name);
+        profile_email = (TextView) findViewById(R.id.profile_email);
+
+        //get current Context
         context = getApplicationContext();
 
 
@@ -181,15 +189,17 @@ public class LoginActivity extends PlusBaseActivity implements LoaderCallbacks<C
             login_layout.removeViewAt(2);
             setTitle("Profile");
             profile_name.setText(sharedPreferences.getString("name", ""));
+            profile_email.setText(sharedPreferences.getString("username", ""));
             Uri uri = Uri.parse("http://timothysnw.co.uk/v1/users/" + sharedPreferences.getString("id", "") + "/image");
             Picasso.with(context).load(uri)
                     .into(profile_pic);
-            //Sign out
+
+            // Sign out button action
             logout_btn = (TextView) findViewById(R.id.logout);
             logout_btn.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    //User logs out
+                    //User logs out, check network connection first
                     if(!isNetworkConnected())
                     {
                         new AlertDialog.Builder(LoginActivity.this).
@@ -203,10 +213,27 @@ public class LoginActivity extends PlusBaseActivity implements LoaderCallbacks<C
                                 })
                                 .show();
                     } else {
-                        progressDialog.setTitle("Sign out");
-                        progressDialog.setMessage("Signing you out...");
-                        progressDialog.show();
-                        new Logout().execute();
+                        new AlertDialog.Builder(LoginActivity.this)
+                                .setTitle("Sign Out")
+                                .setMessage("Are you sure you want to sign out?")
+                                .setCancelable(false)
+                                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                        progressDialog.setTitle("Sign out");
+                                        progressDialog.setMessage("Signing you out...");
+                                        progressDialog.show();
+                                        new Logout().execute();
+                                    }
+                                })
+                                .setNegativeButton("Cancel",new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+
+                                    }
+                                })
+                                .show();
+
                     }
 
                 }
@@ -214,11 +241,15 @@ public class LoginActivity extends PlusBaseActivity implements LoaderCallbacks<C
         }
         else
         {
+            //User is not logged in, Hide profile Scrollview
             login_layout.removeViewAt(3);
 
         }
 
     }
+    /*
+    Check network connection
+     */
     public boolean isNetworkConnected() {
         NetworkInfo ni = null;
         try {
@@ -233,7 +264,23 @@ public class LoginActivity extends PlusBaseActivity implements LoaderCallbacks<C
         } else
             return true;
     }
+    private AlertDialog.Builder getDialog(String title, String message)
+    {
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(LoginActivity.this).
+                setMessage("Network connection unavailable")
+                .setCancelable(false)
+                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
 
+                    }
+                });
+        return alertDialog;
+    }
+
+    /*
+    Async Task to log user out on click the sign out btn
+     */
     private class Logout extends AsyncTask<String,String, String>
     {
 
@@ -293,6 +340,9 @@ public class LoginActivity extends PlusBaseActivity implements LoaderCallbacks<C
             //super.onPostExecute(s);
         }
     }
+    /*
+    On click register open register activity
+     */
     public void Register(View view) {
         Intent intent1 = new Intent(LoginActivity.this, RegisterActivity.class);
         startActivity(intent1);
@@ -540,27 +590,13 @@ public class LoginActivity extends PlusBaseActivity implements LoaderCallbacks<C
 
         @Override
         protected Boolean doInBackground(Void... params) {
-            // TODO: attempt authentication against a network service.
 
-//            try {
-//                // Simulate network access.
-//                Thread.sleep(2000);
-//            } catch (InterruptedException e) {
-//                return false;
-//            }
-//
-//            for (String credential : DUMMY_CREDENTIALS) {
-//                String[] pieces = credential.split(":");
-//                if (pieces[0].equals(mEmail)) {
-//                    // Account exists, return true if the password matches.
-//                    return pieces[1].equals(mPassword);
-//                }
-//            }
             auth = GetData(mEmail,mPassword);
-
-            // TODO: register the new account here.
             return true;
         }
+        /*
+        Http request to check user credentials
+         */
         public String GetData(String username, String password) {
             String userCredentials = username+":"+password;
             String ret= "Basic "+ Base64.encodeToString(userCredentials.getBytes(), Base64.URL_SAFE | Base64.NO_WRAP);
@@ -587,6 +623,7 @@ public class LoginActivity extends PlusBaseActivity implements LoaderCallbacks<C
             int status = response.getStatusLine().getStatusCode();
 
             if (status == 200) {
+                //Login success
                 HttpEntity entity = response.getEntity();
                 try {
                     data = EntityUtils.toString(entity);
@@ -611,6 +648,7 @@ public class LoginActivity extends PlusBaseActivity implements LoaderCallbacks<C
                 }
             }
             else {
+                // Login Failed
                 HttpEntity entity = response.getEntity();
                 try {
                     data = EntityUtils.toString(entity);
@@ -630,13 +668,6 @@ public class LoginActivity extends PlusBaseActivity implements LoaderCallbacks<C
             mAuthTask = null;
             showProgress(false);
             Toast.makeText(LoginActivity.this, auth, Toast.LENGTH_LONG).show();
-
-//            if (success) {
-//                finish();
-//            } else {
-//                mPasswordView.setError(getString(R.string.error_incorrect_password));
-//                mPasswordView.requestFocus();
-//            }
         }
 
         @Override
