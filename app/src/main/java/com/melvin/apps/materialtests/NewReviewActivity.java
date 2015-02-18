@@ -90,7 +90,7 @@ public class NewReviewActivity extends ActionBarActivity {
         progressDialog = new ProgressDialog(this);
         progressDialog2 = new ProgressDialog(this);
         rating = (RatingBar) findViewById(R.id.rating);
-        rating.setRating(5);
+        rating.setRating(1);
         final LayerDrawable stars = (LayerDrawable) rating.getProgressDrawable();
         stars.getDrawable(1).setColorFilter(Color.RED, PorterDuff.Mode.SRC_ATOP);
         stars.getDrawable(2).setColorFilter(Color.GREEN, PorterDuff.Mode.SRC_ATOP);

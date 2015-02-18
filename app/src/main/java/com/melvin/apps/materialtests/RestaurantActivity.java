@@ -108,6 +108,7 @@ public class RestaurantActivity extends BaseActivity {
                 Toast.makeText(RestaurantActivity.this, "AM here" + "" + restaurant_id.get(i), Toast.LENGTH_LONG).show();
             }
         };
+        
 
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
