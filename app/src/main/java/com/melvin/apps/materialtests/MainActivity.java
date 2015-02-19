@@ -539,7 +539,7 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerC
             holder.tv5.setText(temp.description);
             holder.tv6.setText(temp.cuisine);
             holder.tv7.setText(temp.first_name);
-            holder.r1.setRating(Integer.parseInt(temp.rating));
+            holder.r1.setRating(Float.parseFloat(temp.rating));
             holder.r1.setClickable(false);
             holder.r1.setFocusable(false);
             holder.r1.setIsIndicator(false);
