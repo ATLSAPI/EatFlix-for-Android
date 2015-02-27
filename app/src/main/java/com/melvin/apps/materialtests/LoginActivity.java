@@ -636,6 +636,7 @@ public class LoginActivity extends PlusBaseActivity implements LoaderCallbacks<C
                         editor.putString("name", jsonObject.getString("name"));
                         editor.putString("username", username);
                         //editor.apply();
+
                         editor.commit();
                         LoginActivity.this.finish();
                         startActivity(getIntent());

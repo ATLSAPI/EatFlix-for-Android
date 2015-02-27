@@ -43,7 +43,7 @@
         <item>Henry</item>
         <item>Schuster</item>
     </string-array>
-‏                <!--  -->
+‏                    <!--  -->
 
     <string name="reviews_header">Reviews</string>
     <string name="profile_header">My Profile</string>
@@ -61,11 +61,13 @@
     <string name="title_activity_splash">EatFlix</string>
     <string name="title_activity_new_review">NewReviewActivity</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
-    <!--Register Activity-->
+    <!-- Register Activity -->
     <string name="title_activity_register">Register</string>
     <string name="attach_image">Attach Image</string>
     <string name="register">Register</string>
     <string name="sendto">Share with</string>
-    <string name="details">Enter you review here</string>
+    <string name="details">Enter your review here</string>
+    <string name="title_activity_map">MapActivity</string>
+    <string name="map_launcher_text">MAP VIEW</string>
 
 </resources>

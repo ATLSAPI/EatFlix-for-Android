@@ -12,7 +12,10 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingTop="5dp">
+        android:paddingTop="5dp"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
+        android:paddingBottom="5dp">
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="200dp"
@@ -195,6 +198,7 @@
             android:paddingTop="@dimen/padding"
             android:paddingLeft="@dimen/profile_pic"
             android:paddingRight="@dimen/profile_pic"
+            android:paddingBottom="@dimen/padding"
             android:background="@android:color/white"
 
             >
@@ -242,8 +246,7 @@
                 android:id="@+id/submit_review"
                 android:text="SUBMIT REVIEW"
                 android:background="@drawable/submit"
-                android:textColor="@android:color/white"
-                android:paddingBottom="@dimen/padding"/>
+                android:textColor="@android:color/white"/>
             </LinearLayout>
             </LinearLayout>
     </LinearLayout>

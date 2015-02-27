@@ -9,11 +9,13 @@ import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.Point;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.v4.app.NavUtils;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -22,6 +24,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Base64;
 import android.util.Log;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -38,6 +41,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.getbase.floatingactionbutton.FloatingActionButton;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonParser;
 import com.integralblue.httpresponsecache.HttpResponseCache;
 import com.squareup.picasso.Picasso;
 
@@ -54,15 +60,19 @@ import org.json.JSONObject;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Serializable;
 import java.lang.ref.WeakReference;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 import static android.app.PendingIntent.getActivity;
 
 
-public class RestaurantActivity extends BaseActivity {
+public class RestaurantActivity extends ActionBarActivity implements NavigationDrawerCallbacks {
     private  Toolbar mToolbar;
     Button b1;
     FloatingActionButton floatingActionButton;
@@ -83,12 +93,19 @@ public class RestaurantActivity extends BaseActivity {
     private AlertDialog.Builder alertDialog, alertDialog2;
     private SwipeRefreshLayout swipeRefreshLayout;
     private int color=0;
+    OnItemTouchListener itemTouchListener;
+    private NavigationDrawerFragment mNavigationDrawerFragment;
+    private Example example;
+    private HashMap<String, List<String>> map;
+    private ArrayList<HashMap<String, List<Restaurant>>> arrayList;
+    private DrawerLayout drawerLayout;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_restaurant);
+
         mToolbar = (Toolbar) findViewById(R.id.toolbar_actionbar);
         setSupportActionBar(mToolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -101,13 +118,28 @@ public class RestaurantActivity extends BaseActivity {
         netfail = (TextView) findViewById(R.id.net_fail);
         swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.activity_restaurant_swipe_refresh_layout);
         progressDialog = new ProgressDialog(this);
+        drawerLayout = (DrawerLayout) findViewById(R.id.drawer);
+        drawerLayout.setStatusBarBackgroundColor(
+                getResources().getColor(R.color.myPrimaryDarkColor));
 
-        AdapterView.OnItemClickListener t1 = new AdapterView.OnItemClickListener() {
+        //
+        map = new HashMap<String, List<String>>();
+
+        mNavigationDrawerFragment = (NavigationDrawerFragment) getFragmentManager().findFragmentById(R.id.fragment_drawer);
+        mNavigationDrawerFragment.setup(R.id.fragment_drawer, (DrawerLayout) findViewById(R.id.drawer), mToolbar);
+
+//        AdapterView.OnItemClickListener t1 = new AdapterView.OnItemClickListener() {
+//            @Override
+//            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+//                Toast.makeText(RestaurantActivity.this, "AM here" + "" + restaurant_id.get(i), Toast.LENGTH_LONG).show();
+//            }
+//        };
+        mToolbar.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Toast.makeText(RestaurantActivity.this, "AM here" + "" + restaurant_id.get(i), Toast.LENGTH_LONG).show();
+            public void onClick(View view) {
+                new GetLatLngFromAddress().execute();
             }
-        };
+        });
 
 
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -139,24 +171,38 @@ public class RestaurantActivity extends BaseActivity {
 
                             @Override
                             public void onDismissedBySwipeLeft(RecyclerView recyclerView, int[] reverseSortedPositions) {
+                                int swiped_id = 0;
                                 for (int position : reverseSortedPositions) {
                                     mItems.remove(position);
+                                    //Toolbar toolbar = (Toolbar)recyclerView.findViewHolderForPosition(position).;
+                                    swiped_id = position;
+                                    //swipeRefreshLayout.setRefreshing(true);
                                     restaurantAdapter.notifyItemRemoved(position);
                                 }
                                 restaurantAdapter.notifyDataSetChanged();
+
+                                Toast.makeText(RestaurantActivity.this, "Position: "+restaurant_id.get(swiped_id), Toast.LENGTH_LONG).show();
+                                //Delete here
                             }
 
                             @Override
                             public void onDismissedBySwipeRight(RecyclerView recyclerView, int[] reverseSortedPositions) {
+                                int swiped_id = 0;
                                 for (int position : reverseSortedPositions) {
                                     mItems.remove(position);
+                                    swiped_id = position;
                                     restaurantAdapter.notifyItemRemoved(position);
                                 }
                                 restaurantAdapter.notifyDataSetChanged();
+
+                                Toast.makeText(RestaurantActivity.this, "Position: "+restaurant_id.get(swiped_id), Toast.LENGTH_LONG).show();
+                                //Delete here
                             }
                         });
 
         recyclerView.addOnItemTouchListener(swipeTouchListener);
+
+
 
         //Initialise Http cache
         //initialiseCache();
@@ -212,6 +258,64 @@ public class RestaurantActivity extends BaseActivity {
             Toast.makeText(RestaurantActivity.this, e.toString(), Toast.LENGTH_LONG).show();
             e.printStackTrace();
         }
+        itemTouchListener = new OnItemTouchListener() {
+            @Override
+            public void onCardViewTap(View view, int position) {
+                Intent intent = new Intent(RestaurantActivity.this, NewReviewActivity.class);
+                //intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                intent.putExtra("id", restaurant_id.get(position)+"");
+                startActivity(intent);
+                //Toast.makeText(RestaurantActivity.this, "Tapped " + restaurant_id.get(position), Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onToolbarClick(View view, int position) {
+                Toast.makeText(RestaurantActivity.this, "Clicked Toolbar in " + mItems.get(position), Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onToolbarMenuItemClick(View view, int position) {
+                Toast.makeText(RestaurantActivity.this, "Clicked ToolbarMenuItem in " + mItems.get(position), Toast.LENGTH_SHORT).show();
+            }
+        };
+    }
+    @Override
+    public void onNavigationDrawerItemSelected(int position) {
+        //Toast.makeText(this, "Menu item selected -> " + position, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (mNavigationDrawerFragment.isDrawerOpen())
+            mNavigationDrawerFragment.closeDrawer();
+        else
+            super.onBackPressed();
+    }
+    public interface OnItemTouchListener {
+        /**
+         * Callback invoked when the user Taps one of the RecyclerView items
+         *
+         * @param view     the CardView touched
+         * @param position the index of the item touched in the RecyclerView
+         */
+        public void onCardViewTap(View view, int position);
+
+        /**
+         * Callback invoked when the Button1 of an item is touched
+         *
+         * @param view     the Button touched
+         * @param position the index of the item touched in the RecyclerView
+         */
+        public void onToolbarClick(View view, int position);
+
+        /**
+         * Callback invoked when the Button2 of an item is touched
+         *
+         * @param view     the Button touched
+         * @param position the index of the item touched in the RecyclerView
+         */
+
+        public void onToolbarMenuItemClick(View view, int position);
     }
     /*
     Cache for Http connections
@@ -250,7 +354,7 @@ public class RestaurantActivity extends BaseActivity {
             return true;
     }
     private class getRests extends AsyncTask<String, String, String> {
-        ArrayList<Restaurant> list = new ArrayList<Restaurant>();
+        ArrayList<Restaurant> list = new ArrayList<>();
         @Override
         protected String doInBackground(String... strings) {
             String result = getData("http://timothysnw.co.uk/v1/restaurants");
@@ -288,7 +392,7 @@ public class RestaurantActivity extends BaseActivity {
         protected void onPostExecute(String s) {
             try {
                 mItems = list;
-                restaurantAdapter = new ViewRestaurantAdapter(list);
+                restaurantAdapter = new ViewRestaurantAdapter(list, itemTouchListener);
                 recyclerView.setAdapter(restaurantAdapter);
                 restaurantAdapter.notifyDataSetChanged();
                 progressDialog.dismiss();
@@ -338,13 +442,18 @@ public class RestaurantActivity extends BaseActivity {
             NavUtils.navigateUpFromSameTask(this);
             return true;
         }
-        else if(id == R.id.add_restaurant)
+        else if(id == R.id.map_launcher)
         {
-
+            Intent intent1 = new Intent(RestaurantActivity.this, MapActivity.class);
+            intent1.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            //arrayList.add(map);
+            //Serializable obj = (Serializable) map;
+            intent1.putExtra("lat", map);
+            startActivity(intent1);
         }
         return super.onOptionsItemSelected(item);
     }
-    class Restaurant
+    class Restaurant implements Serializable
     {
         String id;
         String restaurant;
@@ -407,9 +516,11 @@ public class RestaurantActivity extends BaseActivity {
     public class ViewRestaurantAdapter extends RecyclerView.Adapter<ViewRestaurantAdapter.RestaurantViewHolder> {
 
         private List<Restaurant> contactList;
+        private OnItemTouchListener onItemTouchListener;
 
-        public ViewRestaurantAdapter(List<Restaurant> contactList) {
+        public ViewRestaurantAdapter(List<Restaurant> contactList, OnItemTouchListener onItemTouchListener) {
             this.contactList = contactList;
+            this.onItemTouchListener = onItemTouchListener;
         }
 
         @Override
@@ -440,6 +551,7 @@ public class RestaurantActivity extends BaseActivity {
                 contactViewHolder.toolbar.setTitleTextColor(getResources().getColor(R.color.ControlText));
                 if (contactViewHolder.toolbar != null) {
                     // inflate your menu
+                    contactViewHolder.toolbar.getMenu().clear();
                     contactViewHolder.toolbar.inflateMenu(R.menu.menu_cardview);
                     contactViewHolder.toolbar.getMenu().findItem(R.id.action_share).setTitle(ci.id);
                     contactViewHolder.toolbar.getMenu().findItem(R.id.action_add).setTitle(ci.id);
@@ -447,6 +559,7 @@ public class RestaurantActivity extends BaseActivity {
                     contactViewHolder.toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
                         @Override
                         public boolean onMenuItemClick(MenuItem menuItem) {
+
                             if (menuItem.getItemId() == R.id.action_share) {
                                 //menuItem
                                 Toast.makeText(RestaurantActivity.this, menuItem.getTitle() + "", Toast.LENGTH_LONG).show();
@@ -461,6 +574,7 @@ public class RestaurantActivity extends BaseActivity {
                         }
 
                     });
+
                 }
 
 
@@ -472,6 +586,30 @@ public class RestaurantActivity extends BaseActivity {
             contactViewHolder.average.setText(Math.round(percent)+"%");
             contactViewHolder.number.setText(ci.reviewed+" reviews");
             //contactViewHolder.vTitle.setText(ci.name + " " + ci.surname);
+            //
+            //Load List
+            String output = "";
+            ci.address.replace(" ","+");
+            try {
+                output = new GetLatLngFromAddress().execute(ci.address.replace(" ","+")+ci.town.replace(" ","+")+ci.postcode.replace(" ","+")+"+UK").get();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } catch (ExecutionException e) {
+                e.printStackTrace();
+            }
+            if(!output.trim().isEmpty()) {
+                //contactViewHolder.coordinates.setText(output);
+                List<String> restaurants = new ArrayList<>();
+                restaurants.add(0,ci.restaurant);
+                String[] lat_lng =output.split(",");
+                restaurants.add(1, lat_lng[0]);
+                restaurants.add(2, lat_lng[1]);
+                map.put(ci.id,restaurants);
+            }
+
+//            List<Restaurant> restaurants = new ArrayList<>();
+//            restaurants.add(ci);
+//            map.put(ci.id+","+output,restaurants);
 
         }
 
@@ -489,7 +627,7 @@ public class RestaurantActivity extends BaseActivity {
             protected ImageView imageView;
             protected Toolbar toolbar;
             protected TextView average;
-            protected TextView number;
+            protected TextView number, coordinates;
 
             public RestaurantViewHolder(View v) {
                 super(v);
@@ -497,10 +635,16 @@ public class RestaurantActivity extends BaseActivity {
                 imageView = (ImageView) v.findViewById(R.id.restaurant_image);
                 //imageView.setAlpha(65);
                 toolbar = (Toolbar) v.findViewById(R.id.card_toolbar);
-
+                coordinates = (TextView) v.findViewById(R.id.coordinates);
                 average = (TextView)  v.findViewById(R.id.average_reviews);
                 number = (TextView)  v.findViewById(R.id.reviews_num);
                 //vTitle = (TextView) v.findViewById(R.id.title);
+                v.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onItemTouchListener.onCardViewTap(view, getPosition());
+                    }
+                });
 
 
             }
@@ -580,6 +724,57 @@ public class RestaurantActivity extends BaseActivity {
         }
 
 
+    }
+    private class GetLatLngFromAddress extends AsyncTask<String, String, String>{
+
+        @Override
+        protected String doInBackground(String... strings) {
+//            String url = "https://maps.googleapis.com/maps/api/geocode/json?address=1600+Amphitheatre+Parkway,+Mountain+View,+CA&key=AIzaSyCbsof3EMi0eHl8nZuobes6Mj_W768iSec";
+//            String url = "https://maps.googleapis.com/maps/api/geocode/json?address=47+The+Linkway+Horwich,BL66JAUK&key=AIzaSyCbsof3EMi0eHl8nZuobes6Mj_W768iSec";
+            String url = "https://maps.googleapis.com/maps/api/geocode/json?address="+strings[0]+"&key=AIzaSyCbsof3EMi0eHl8nZuobes6Mj_W768iSec";
+            HttpClient httpclient = new DefaultHttpClient();
+            HttpGet httpGet = new HttpGet(url);
+            HttpResponse response = null;
+            try {
+
+                response = httpclient.execute(httpGet);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            String data = null;
+            int status = response.getStatusLine().getStatusCode();
+
+            if (status == 200) {
+                //Login success
+                HttpEntity entity = response.getEntity();
+                try {
+                    data = EntityUtils.toString(entity);
+                    try {
+                        JSONObject jsonObject= new JSONObject(data);
+                        JSONArray results = jsonObject.getJSONArray("results");
+                        JSONObject location = (JSONObject) results.get(0);
+                        JSONObject geometry = location.getJSONObject("geometry");
+                        JSONObject locationJSONObject = geometry.getJSONObject("location");
+                        double latitude = locationJSONObject.getDouble("lat");
+                        double longitude = locationJSONObject.getDouble("lng");
+                        data = latitude+","+longitude;
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                        data = "";
+                    }
+                } catch (IOException e) {
+                    data = "";
+                }
+            }
+            return data;
+        }
+
+//        @Override
+//        protected void onPostExecute(String s) {
+//            //Toast.makeText(RestaurantActivity.this, s, Toast.LENGTH_LONG).show();
+//            super.onPostExecute(s);
+//
+//        }
     }
 
 

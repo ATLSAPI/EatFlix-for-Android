@@ -10,6 +10,7 @@ import android.graphics.drawable.LayerDrawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
+import android.os.PersistableBundle;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -63,6 +64,9 @@ public class NewReviewActivity extends ActionBarActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Bundle bundle = savedInstanceState != null ? savedInstanceState : getIntent().getExtras();
+        newString= bundle.getString("id");
+        restaurant_id = newString;
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_review);
         //Set Custom toolbar
@@ -90,7 +94,7 @@ public class NewReviewActivity extends ActionBarActivity {
         progressDialog = new ProgressDialog(this);
         progressDialog2 = new ProgressDialog(this);
         rating = (RatingBar) findViewById(R.id.rating);
-        rating.setRating(1);
+        rating.setRating(0);
         final LayerDrawable stars = (LayerDrawable) rating.getProgressDrawable();
         stars.getDrawable(1).setColorFilter(Color.RED, PorterDuff.Mode.SRC_ATOP);
         stars.getDrawable(2).setColorFilter(Color.GREEN, PorterDuff.Mode.SRC_ATOP);
@@ -137,17 +141,9 @@ public class NewReviewActivity extends ActionBarActivity {
 
 
         //String newString;
-        if (savedInstanceState == null) {
-            Bundle extras = getIntent().getExtras();
-            if(extras == null) {
-                newString= null;
-            } else {
-                newString= extras.getString("id");
-            }
-        } else {
-            newString= (String) savedInstanceState.getSerializable("id");
-            restaurant_id = newString;
-        }
+        //if (savedInstanceState == null) {
+
+        //}
         Uri uri = Uri.parse("http://timothysnw.co.uk/v1/restaurants/" + newString + "/image");
         Picasso.with(image.getContext()).load(uri)
                 .into(image);
@@ -163,7 +159,6 @@ public class NewReviewActivity extends ActionBarActivity {
         }
 
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

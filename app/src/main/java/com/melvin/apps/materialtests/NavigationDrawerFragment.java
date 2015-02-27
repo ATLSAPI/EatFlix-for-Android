@@ -167,6 +167,11 @@ public class NavigationDrawerFragment extends Fragment implements NavigationDraw
 //                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 //                getActivity().startActivity(intent);
                 break;
+            case 1:
+                intent = new Intent(getActivity(), MainActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                getActivity().startActivity(intent);
+                break;
             case 2:
                 intent = new Intent(getActivity(), RestaurantActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);

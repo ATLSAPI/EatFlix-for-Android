@@ -8,8 +8,11 @@
     android:layout_height="match_parent"
     android:padding="10dp"
     card_view:cardCornerRadius="2dp"
+    card_view:cardUseCompatPadding="true"
     android:layout_margin="5dp"
-    android:background="@drawable/button">
+    android:background="@drawable/button"
+    android:foreground="?android:attr/selectableItemBackground"
+    >
     <android.support.v7.widget.Toolbar
         android:id="@+id/card_toolbar"
         android:layout_width="match_parent"
@@ -70,16 +73,16 @@
         android:background="#80000000">
     <TextView
         android:layout_height="wrap_content"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:textColor="@android:color/white"
         android:textSize="20sp"
         android:id="@+id/reviews_num"/>
-        <!--<TextView-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:textColor="@color/material_blue_grey_800"-->
-            <!--android:textSize="30sp"-->
-            <!--android:id="@+id/review"/>-->
+        <TextView
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:textColor="@android:color/white"
+            android:textSize="20sp"
+            android:id="@+id/coordinates"/>
     </LinearLayout>
         </LinearLayout>
 
