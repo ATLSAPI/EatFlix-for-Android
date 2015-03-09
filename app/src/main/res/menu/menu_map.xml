@@ -2,8 +2,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.melvin.apps.materialtests.MapActivity">
-    <item android:id="@+id/near" android:title="@string/list_launcher_text"
-        android:orderInCategory="100" app:showAsAction="always" android:icon="@drawable/ic_location_on_white_36dp"/>
+
     <item android:id="@+id/list_view" android:title="@string/list_launcher_text"
         android:orderInCategory="100" app:showAsAction="always" android:icon="@drawable/ic_format_list_bulleted_white_24dp"/>
 </menu>

@@ -151,6 +151,7 @@
         </activity>
         <activity
             android:name=".NearPlacesActivity"
+            android:parentActivityName=".MapActivity"
             android:label="@string/title_activity_near_places"
             android:theme="@style/AppTheme">
         </activity>

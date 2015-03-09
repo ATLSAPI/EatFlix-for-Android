@@ -48,6 +48,7 @@ public class MapActivity extends ActionBarActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Bundle bundle = savedInstanceState != null ? savedInstanceState : getIntent().getExtras();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
         mToolbar = (Toolbar) findViewById(R.id.toolbar_actionbar);
@@ -58,8 +59,14 @@ public class MapActivity extends ActionBarActivity {
         progressDialog.setTitle("Loading");
         progressDialog.setMessage("Loading map coordinates...");
         progressDialog.show();
-        drawMarker =
-                (HashMap<String, List<String>>) getIntent().getSerializableExtra("lat");
+
+        try {
+            drawMarker =
+                    (HashMap<String, List<String>>) bundle.getSerializable("lat");
+        } catch (NullPointerException e) {
+            //NavUtils.navigateUpFromSameTask(this);
+            e.printStackTrace();
+        }
         map = ((MapFragment) getFragmentManager().findFragmentById(R.id.map))
                 .getMap();
         //new LoadMap().execute();
@@ -221,12 +228,7 @@ public class MapActivity extends ActionBarActivity {
             NavUtils.navigateUpFromSameTask(this);
             return true;
         }
-        else if (id == R.id.near)
-        {
-            Intent intent = new Intent(MapActivity.this, NearPlacesActivity.class);
-            startActivity(intent);
 
-        }
 
         return super.onOptionsItemSelected(item);
     }

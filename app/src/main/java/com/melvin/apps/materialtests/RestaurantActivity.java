@@ -22,6 +22,7 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.Html;
 import android.util.Base64;
 import android.util.Log;
 import android.view.Display;
@@ -475,6 +476,13 @@ public class RestaurantActivity extends ActionBarActivity implements NavigationD
             NavUtils.navigateUpFromSameTask(this);
             return true;
         }
+        else if (id == R.id.near)
+        {
+            Intent intent = new Intent(RestaurantActivity.this, NearPlacesActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(intent);
+
+        }
         else if(id == R.id.map_launcher) {
 
 //            progressDialog2.setTitle("Loading");
@@ -590,11 +598,16 @@ public class RestaurantActivity extends ActionBarActivity implements NavigationD
 //            contactViewHolder.toolbar.setBackgroundColor(color);
             /*
              */
-
+            //final String full_address = ci.address.replace(" ","+")+ci.town.replace(" ","+")+ci.postcode.replace(" ","+")+"+UK";
+            final String full_address = ci.address+" "+ci.town+" "+ci.postcode;
             try {
 //                Picasso.with(contactViewHolder.imageView.getContext()).load(R.drawable.restaurant_default)
 //                        .into(contactViewHolder.imageView);
 //                contactViewHolder.imageView.setImageResource(R.drawable.restaurant_default);
+                final String review_num = ci.reviewed;
+                final String average = String.valueOf(Float.parseFloat(ci.average));
+                final String name = ci.restaurant;
+                final int percentage = Math.round(Float.parseFloat(ci.average) / 5 * 100);
                 Context context = contactViewHolder.imageView.getContext();
                 Picasso.with(contactViewHolder.imageView.getContext()).load(uri)
                         .into(contactViewHolder.imageView);
@@ -615,6 +628,16 @@ public class RestaurantActivity extends ActionBarActivity implements NavigationD
                             if (menuItem.getItemId() == R.id.action_share) {
                                 //menuItem
                                 Toast.makeText(RestaurantActivity.this, menuItem.getTitle() + "", Toast.LENGTH_LONG).show();
+                                Intent sendIntent = new Intent();
+                                sendIntent.setAction(Intent.ACTION_SEND);
+                                sendIntent.putExtra(Intent.EXTRA_TEXT,
+                                        Html.fromHtml("<b>Name: <b/>")+name+ Html.fromHtml("<br>")+
+                                        Html.fromHtml("<b>Address: <b/>")+full_address+ Html.fromHtml("<br>")+
+                                        Html.fromHtml("<b>Number of Reviews: <b/>")+review_num+ Html.fromHtml("<br>")+
+                                        Html.fromHtml("<b>Average Reviews: <b/>")+average+ Html.fromHtml("<br>")+
+                                        Html.fromHtml("<b>Percentage: <b/>")+percentage+"%");
+                                sendIntent.setType("text/plain");
+                                startActivity(Intent.createChooser(sendIntent, getResources().getText(R.string.sendto)));
                             } else if (menuItem.getItemId() == R.id.action_delete) {
 
                             } else if (menuItem.getItemId() == R.id.action_add) {
@@ -639,7 +662,7 @@ public class RestaurantActivity extends ActionBarActivity implements NavigationD
             contactViewHolder.number.setText(ci.reviewed+" reviews");
             //contactViewHolder.vTitle.setText(ci.name + " " + ci.surname);
             //
-            String full_address = ci.address.replace(" ","+")+ci.town.replace(" ","+")+ci.postcode.replace(" ","+")+"+UK";
+            //String full_address = ci.address.replace(" ","+")+ci.town.replace(" ","+")+ci.postcode.replace(" ","+")+"+UK";
             //Load List
             String output = "";
             ci.address.replace(" ","+");
