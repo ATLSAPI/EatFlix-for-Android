@@ -1,7 +1,10 @@
 package com.melvin.apps.materialtests;
 
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -65,6 +68,11 @@ public class SinglePlaceActivity extends ActionBarActivity {
 
     AlertDialogManager alertDialogManager;
 
+    AlertDialog.Builder alertDialog;
+
+    SharedPreferences sharedPreferences;
+
+
 
 
 
@@ -89,6 +97,25 @@ public class SinglePlaceActivity extends ActionBarActivity {
         // creating GPS Class object
         gpsTracker = new GPSTracker(this);
 
+        alertDialog = new AlertDialog.Builder(this)
+                .setTitle("You need to be logged in")
+                .setMessage("Login?")
+                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        Intent intent_add = new Intent(SinglePlaceActivity.this, LoginActivity.class);
+                        //intent_add.putExtra("selected_restaurants_id",reviews_id.get(i));
+                        startActivity(intent_add);
+                    }
+                })
+                .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        // do nothing
+                    }
+                })
+                .setIcon(android.R.drawable.ic_dialog_alert);
+
+        sharedPreferences = getSharedPreferences("Auth",MODE_PRIVATE);
+
         // check if GPS location can get
         if (gpsTracker.canGetLocation()) {
             Log.d("Your Location", "latitude:" + gpsTracker.getLatitude() + ", longitude: " + gpsTracker.getLongitude());
@@ -105,13 +132,21 @@ public class SinglePlaceActivity extends ActionBarActivity {
         addPlaces.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent i = new Intent(SinglePlaceActivity.this, NewRestaurant.class);
-                i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                i.putExtra("name", PlacesName);
-                i.putExtra("address",PlacesAddress);
-                i.putExtra("latitude",PlacesLatitude);
-                i.putExtra("longitude",PlacesLongitude);
-                startActivity(i);
+                if (sharedPreferences.contains("token") && sharedPreferences.contains("id") && sharedPreferences.contains("device_id")) {
+                    Intent i = new Intent(SinglePlaceActivity.this, NewRestaurant.class);
+                    //i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    i.putExtra("name", PlacesName);
+                    i.putExtra("address",PlacesAddress);
+                    i.putExtra("latitude",PlacesLatitude);
+                    i.putExtra("longitude",PlacesLongitude);
+                    startActivity(i);
+                }
+                else
+                {
+                    alertDialog.show();
+                    //Not Logged in
+                }
+
 
             }
         });

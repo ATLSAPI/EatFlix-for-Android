@@ -65,6 +65,7 @@ public class NewRestaurant extends ActionBarActivity {
     Bitmap bitmap;
     private SharedPreferences sharedPreferences;
     private String output = "";
+    boolean added = false;
 
 
     public static String image = "";
@@ -83,7 +84,7 @@ public class NewRestaurant extends ActionBarActivity {
         setSupportActionBar(mToolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
-        getWindow().setStatusBarColor(R.color.myTextSecondaryColor);
+        //getWindow().setStatusBarColor(R.color.myTextSecondaryColor);
 //        b1 = (Button) findViewById(R.id.image_btn);
 //        b2 = (Button) findViewById(R.id.sub_btn);
         progress = new ProgressDialog(this);
@@ -100,15 +101,18 @@ public class NewRestaurant extends ActionBarActivity {
         sharedPreferences = getSharedPreferences("Auth", MODE_PRIVATE);
         imagePath = "";
         try {
+
             String name = bundle.getString("name");
             String address = bundle.getString("address");
             latitude = bundle.getString("latitude");
             longitude = bundle.getString("longitude");
+            added = true;
             et1.setText(name);
             et5.setText(address);
         }
         catch (NullPointerException e)
         {
+            added = false;
             e.printStackTrace();
         }
 
@@ -323,7 +327,7 @@ public class NewRestaurant extends ActionBarActivity {
                 progress2.setMessage("Wait while loading...");
                 progress2.show();
 
-                if (!latitude.equals("") && !longitude.equals("")) {
+                //if (!added) {
 
                     String address_this = address_edit_text.replace(" ", "+") + town.replace(" ", "+") + postcode_text.replace(" ", "+") + "+UK";
                     try {
@@ -348,7 +352,7 @@ public class NewRestaurant extends ActionBarActivity {
                         progress2.dismiss();
                         Toast.makeText(NewRestaurant.this, "Address not found, Please enter a valid address", Toast.LENGTH_LONG).show();
                     }
-                }
+                //}
             }
 
         }
