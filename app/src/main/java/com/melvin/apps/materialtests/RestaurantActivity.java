@@ -65,6 +65,7 @@ import java.lang.ref.WeakReference;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
@@ -82,7 +83,7 @@ public class RestaurantActivity extends ActionBarActivity implements NavigationD
     RecyclerView recyclerView;
     ViewRestaurantAdapter restaurantAdapter;
     ArrayList<Integer> restaurant_id = new ArrayList<Integer>();
-    ProgressDialog progressDialog;
+    ProgressDialog progressDialog, progressDialog2;
     ImageView img;
     Bitmap bitmap;
     View convertView;
@@ -92,17 +93,22 @@ public class RestaurantActivity extends ActionBarActivity implements NavigationD
     TextView error_tv, netfail;
     private AlertDialog.Builder alertDialog, alertDialog2;
     private SwipeRefreshLayout swipeRefreshLayout;
-    private int color=0;
+    private int color = 0;
+    private boolean added = false;
+    AlertDialogManager alertDialogManager = new AlertDialogManager();
     OnItemTouchListener itemTouchListener;
     private NavigationDrawerFragment mNavigationDrawerFragment;
-    private Example example;
     private HashMap<String, List<String>> map;
-    private ArrayList<HashMap<String, List<Restaurant>>> arrayList;
+    private HashMap<String, List<String>> arrayList;
     private DrawerLayout drawerLayout;
+    private Menu actionBarMenu;
+    private String type;
+    private String get_url = "http://timothysnw.co.uk/v1/restaurants";
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Bundle bundle = savedInstanceState != null ? savedInstanceState : getIntent().getExtras();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_restaurant);
 
@@ -118,28 +124,44 @@ public class RestaurantActivity extends ActionBarActivity implements NavigationD
         netfail = (TextView) findViewById(R.id.net_fail);
         swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.activity_restaurant_swipe_refresh_layout);
         progressDialog = new ProgressDialog(this);
+        progressDialog2 = new ProgressDialog(this);
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer);
-        drawerLayout.setStatusBarBackgroundColor(
-                getResources().getColor(R.color.myPrimaryDarkColor));
 
         //
         map = new HashMap<String, List<String>>();
+        arrayList = new HashMap<String, List<String>>();
 
         mNavigationDrawerFragment = (NavigationDrawerFragment) getFragmentManager().findFragmentById(R.id.fragment_drawer);
         mNavigationDrawerFragment.setup(R.id.fragment_drawer, (DrawerLayout) findViewById(R.id.drawer), mToolbar);
 
-//        AdapterView.OnItemClickListener t1 = new AdapterView.OnItemClickListener() {
+
+//        mToolbar.setOnClickListener(new View.OnClickListener() {
 //            @Override
-//            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-//                Toast.makeText(RestaurantActivity.this, "AM here" + "" + restaurant_id.get(i), Toast.LENGTH_LONG).show();
+//            public void onClick(View view) {
+//                new GetLatLngFromAddress().execute();
 //            }
-//        };
-        mToolbar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                new GetLatLngFromAddress().execute();
+//        });
+        try {
+            type = bundle.getString("type").toLowerCase();
+
+            switch (type)
+            {
+                case "bar":
+                    get_url = "http://timothysnw.co.uk/v1/bars";
+                    setTitle("Bars");
+                    break;
+                case "pub":
+                    get_url = "http://timothysnw.co.uk/v1/pubs";
+                    setTitle("Pubs");
+                    break;
+                default:
+                    break;
             }
-        });
+        }
+        catch (NullPointerException e)
+        {
+            e.printStackTrace();
+        }
 
 
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -357,7 +379,8 @@ public class RestaurantActivity extends ActionBarActivity implements NavigationD
         ArrayList<Restaurant> list = new ArrayList<>();
         @Override
         protected String doInBackground(String... strings) {
-            String result = getData("http://timothysnw.co.uk/v1/restaurants");
+            String result = getData(get_url);
+
             try {
                 JSONArray jsonArray = new JSONArray(result);
                 JSONObject tempObject;
@@ -377,7 +400,9 @@ public class RestaurantActivity extends ActionBarActivity implements NavigationD
                                 tempObject.getString("id"),
                                 tempObject.getString("cuisine"),
                                 tempObject.getString("reviewed"),
-                                tempObject.getString("average")));
+                                tempObject.getString("average"),
+                                tempObject.getString("latitude"),
+                               tempObject.getString("longitude")));
                         restaurant_id.add(tempObject.getInt("id"));
                     }
                 }
@@ -395,6 +420,12 @@ public class RestaurantActivity extends ActionBarActivity implements NavigationD
                 restaurantAdapter = new ViewRestaurantAdapter(list, itemTouchListener);
                 recyclerView.setAdapter(restaurantAdapter);
                 restaurantAdapter.notifyDataSetChanged();
+                if (restaurantAdapter.getItemCount()>0)
+                {
+                    added = true;
+                }
+                actionBarMenu.getItem(0).setEnabled(true);
+//                invalidateOptionsMenu();
                 progressDialog.dismiss();
 
             } catch (Exception e) {
@@ -422,6 +453,8 @@ public class RestaurantActivity extends ActionBarActivity implements NavigationD
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_restaurant, menu);
+        actionBarMenu = menu;
+        menu.getItem(0).setEnabled(false);
         return true;
     }
 
@@ -442,14 +475,26 @@ public class RestaurantActivity extends ActionBarActivity implements NavigationD
             NavUtils.navigateUpFromSameTask(this);
             return true;
         }
-        else if(id == R.id.map_launcher)
-        {
-            Intent intent1 = new Intent(RestaurantActivity.this, MapActivity.class);
-            intent1.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            //arrayList.add(map);
-            //Serializable obj = (Serializable) map;
-            intent1.putExtra("lat", map);
-            startActivity(intent1);
+        else if(id == R.id.map_launcher) {
+
+//            progressDialog2.setTitle("Loading");
+//            progressDialog2.setMessage("Loading map coordinates...");
+//            progressDialog2.show();
+            if (added) {
+                Intent intent1 = new Intent(RestaurantActivity.this, MapActivity.class);
+                intent1.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                //arrayList.add(map);
+                //TODO: Implement arrayList HashMap here
+                intent1.putExtra("lat", map);
+                //progressDialog2.dismiss();
+                startActivity(intent1);
+            }
+            else
+            {
+                alertDialogManager.showAlertDialog(RestaurantActivity.this, "Map View",
+                        "No "+getTitle()+" to show",
+                        false);
+            }
         }
         return super.onOptionsItemSelected(item);
     }
@@ -464,10 +509,12 @@ public class RestaurantActivity extends ActionBarActivity implements NavigationD
         String cuisine;
         String reviewed;
         String average;
+        String latitude;
+        String longitude;
                 //String description;
 
 
-         Restaurant(String restaurant, String address,String postcode,String town,String type,String id,String cuisine, String reviewed, String average)
+        Restaurant(String restaurant, String address,String postcode,String town,String type,String id,String cuisine, String reviewed, String average, String latitude, String longitude)
         {
             this.restaurant = restaurant;
             this.type = type;
@@ -478,6 +525,8 @@ public class RestaurantActivity extends ActionBarActivity implements NavigationD
             this.id = id;
             this.reviewed = reviewed;
             this.average = average;
+            this.latitude =  latitude;
+            this.longitude =  longitude;
         }
 
     }
@@ -541,8 +590,11 @@ public class RestaurantActivity extends ActionBarActivity implements NavigationD
 //            contactViewHolder.toolbar.setBackgroundColor(color);
             /*
              */
+
             try {
-                contactViewHolder.imageView.setImageBitmap(null);
+//                Picasso.with(contactViewHolder.imageView.getContext()).load(R.drawable.restaurant_default)
+//                        .into(contactViewHolder.imageView);
+//                contactViewHolder.imageView.setImageResource(R.drawable.restaurant_default);
                 Context context = contactViewHolder.imageView.getContext();
                 Picasso.with(contactViewHolder.imageView.getContext()).load(uri)
                         .into(contactViewHolder.imageView);
@@ -587,29 +639,46 @@ public class RestaurantActivity extends ActionBarActivity implements NavigationD
             contactViewHolder.number.setText(ci.reviewed+" reviews");
             //contactViewHolder.vTitle.setText(ci.name + " " + ci.surname);
             //
+            String full_address = ci.address.replace(" ","+")+ci.town.replace(" ","+")+ci.postcode.replace(" ","+")+"+UK";
             //Load List
             String output = "";
             ci.address.replace(" ","+");
-            try {
-                output = new GetLatLngFromAddress().execute(ci.address.replace(" ","+")+ci.town.replace(" ","+")+ci.postcode.replace(" ","+")+"+UK").get();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            } catch (ExecutionException e) {
-                e.printStackTrace();
-            }
-            if(!output.trim().isEmpty()) {
-                //contactViewHolder.coordinates.setText(output);
-                List<String> restaurants = new ArrayList<>();
-                restaurants.add(0,ci.restaurant);
-                String[] lat_lng =output.split(",");
-                restaurants.add(1, lat_lng[0]);
-                restaurants.add(2, lat_lng[1]);
-                map.put(ci.id,restaurants);
-            }
+            //TODO: Cut out here
+//            String address_this = ci.address.replace(" ","+")+ci.town.replace(" ","+")+ci.postcode.replace(" ","+")+"+UK";
+//            try {
+//                output = new GetLatLngFromAddress().execute(ci.address.replace(" ","+")+ci.town.replace(" ","+")+ci.postcode.replace(" ","+")+"+UK").get();
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            } catch (ExecutionException e) {
+//                e.printStackTrace();
+//            }
+//            if(!output.trim().isEmpty()) {
+//                //contactViewHolder.coordinates.setText(output);
+//                List<String> restaurants = new ArrayList<>();
+//                restaurants.add(0,ci.restaurant);
+//                String[] lat_lng =output.split(",");
+//                restaurants.add(1, lat_lng[0]);
+//                restaurants.add(2, lat_lng[1]);
+//
+//                map.put(ci.id,restaurants);
+//            }
+//            List<String> info = new ArrayList<>();
+//            info.add(0,ci.restaurant);
+//            info.add(1, full_address);
+//            arrayList.put(ci.id, info);
+            //Inserted...
 
 //            List<Restaurant> restaurants = new ArrayList<>();
 //            restaurants.add(ci);
 //            map.put(ci.id+","+output,restaurants);
+            if(!ci.longitude.equals("none")) {
+                List<String> restaurants = new ArrayList<>();
+                restaurants.add(0, ci.restaurant);
+                restaurants.add(1, ci.latitude);
+                restaurants.add(2, ci.longitude);
+                map.put(ci.id, restaurants);
+
+            }
 
         }
 
@@ -742,7 +811,10 @@ public class RestaurantActivity extends ActionBarActivity implements NavigationD
                 e.printStackTrace();
             }
             String data = null;
-            int status = response.getStatusLine().getStatusCode();
+            int status = 0;
+            if (response != null) {
+                status = response.getStatusLine().getStatusCode();
+            }
 
             if (status == 200) {
                 //Login success

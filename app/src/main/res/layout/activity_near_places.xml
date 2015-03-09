@@ -1,8 +1,8 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.melvin.apps.materialtests.MapActivity"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    tools:context="com.melvin.apps.materialtests.NearPlacesActivity">
     <com.melvin.apps.materialtests.ScrimInsetsFrameLayout
         android:id="@+id/scrimInsetsFrameLayout"
         android:layout_width="match_parent"
@@ -13,26 +13,27 @@
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto">
     </com.melvin.apps.materialtests.ScrimInsetsFrameLayout>
-
     <include
         android:id="@+id/toolbar_actionbar"
         layout="@layout/toolbar_default"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"/>
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:paddingTop="@dimen/padding"
-        android:paddingBottom="@dimen/padding">
 
-    <fragment
-        android:id="@+id/map"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        class="com.google.android.gms.maps.MapFragment"/>
+    <!-- Show on Map button -->
+    <Button android:id="@+id/btn_show_map"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="Show Places on Map"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="10dip"
+        android:textColor="@android:color/white"/>
 
-    </LinearLayout>
+    <!--  List view -->
+    <ListView
+        android:id="@+id/list"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/btn_show_map"/>
 
 </LinearLayout>

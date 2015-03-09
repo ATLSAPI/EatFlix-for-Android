@@ -3,5 +3,5 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.melvin.apps.materialtests.RestaurantActivity">
     <item android:id="@+id/map_launcher" android:title="@string/map_launcher_text"
-        android:orderInCategory="100" app:showAsAction="ifRoom" />
+        android:orderInCategory="100" app:showAsAction="ifRoom" android:icon="@drawable/ic_map_white_36dp" />
 </menu>

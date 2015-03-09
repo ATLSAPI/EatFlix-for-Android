@@ -13,7 +13,7 @@
         <item name="colorControlActivated">@color/myAccentColor</item>
         <item name="colorControlHighlight">@color/myAccentColor</item>
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
-        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:statusBarColor">@color/myTextSecondaryColor</item>
 
         <item name="android:windowBackground">@color/myWindowBackground</item>
         <item name="android:windowContentTransitions">true</item>

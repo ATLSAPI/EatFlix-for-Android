@@ -26,7 +26,7 @@ import java.util.List;
 public class NavigationDrawerFragment extends Fragment implements NavigationDrawerCallbacks {
     private static final String PREF_USER_LEARNED_DRAWER = "navigation_drawer_learned";
     private static final String STATE_SELECTED_POSITION = "selected_navigation_drawer_position";
-    private static final String PREFERENCES_FILE = "my_app_settings"; //TODO: change this to your file
+    private static final String PREFERENCES_FILE = "my_app_settings";
     private NavigationDrawerCallbacks mCallbacks;
     private RecyclerView mDrawerList;
     private View mFragmentContainerView;
@@ -98,7 +98,7 @@ public class NavigationDrawerFragment extends Fragment implements NavigationDraw
         mFragmentContainerView = getActivity().findViewById(fragmentId);
         mDrawerLayout = drawerLayout;
         mDrawerLayout.setStatusBarBackgroundColor(
-                getResources().getColor(R.color.myPrimaryDarkColor));
+                getResources().getColor(R.color.myTextSecondaryColor));
 
         mActionBarDrawerToggle = new ActionBarDrawerToggle(getActivity(), mDrawerLayout, toolbar, R.string.drawer_open, R.string.drawer_close) {
             @Override
@@ -150,11 +150,11 @@ public class NavigationDrawerFragment extends Fragment implements NavigationDraw
 
     public List<NavigationItem> getMenu() {
         List<NavigationItem> items = new ArrayList<NavigationItem>();
-        items.add(new NavigationItem("Reviews", getResources().getDrawable(R.drawable.ic_rate_review_black_18dp)));
-        items.add(new NavigationItem("Restaurants", getResources().getDrawable(R.drawable.ic_local_restaurant_black_18dp)));
-        items.add(new NavigationItem("Pub", getResources().getDrawable(R.drawable.ic_local_bar_grey600_18dp)));
-        items.add(new NavigationItem("Bars", getResources().getDrawable(R.drawable.ic_local_bar_black_18dp)));
-        items.add(new NavigationItem("Login", getResources().getDrawable(R.drawable.common_signin_btn_icon_dark)));
+        items.add(new NavigationItem("Reviews", getResources().getDrawable(R.drawable.ic_rate_review_black_24dp)));
+        items.add(new NavigationItem("Restaurants", getResources().getDrawable(R.drawable.ic_local_restaurant_black_24dp)));
+        items.add(new NavigationItem("Pubs", getResources().getDrawable(R.drawable.ic_local_cafe_black_18dp)));
+        items.add(new NavigationItem("Bars", getResources().getDrawable(R.drawable.ic_local_bar_black_24dp)));
+        items.add(new NavigationItem("Login", getResources().getDrawable(R.drawable.ic_account_box_black_24dp)));
         return items;
     }
 
@@ -173,8 +173,38 @@ public class NavigationDrawerFragment extends Fragment implements NavigationDraw
                 getActivity().startActivity(intent);
                 break;
             case 2:
+                if (getActivity().getClass().getSimpleName().equals("RestaurantActivity")){
+                    if (!(getActivity().getTitle().equals("Restaurants")))
+                    {
+                        getActivity().finish();
+                    }
+                }
                 intent = new Intent(getActivity(), RestaurantActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                getActivity().startActivity(intent);
+                break;
+            case 3:
+                if (getActivity().getClass().getSimpleName().equals("RestaurantActivity")){
+                    if (!(getActivity().getTitle().equals("Pubs")))
+                    {
+                        getActivity().finish();
+                    }
+                }
+                intent = new Intent(getActivity(), RestaurantActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                intent.putExtra("type","Pub");
+                getActivity().startActivity(intent);
+                break;
+            case 4:
+                if (getActivity().getClass().getSimpleName().equals("RestaurantActivity")){
+                    if (!(getActivity().getTitle().equals("Bars")))
+                    {
+                        getActivity().finish();
+                    }
+                }
+                intent = new Intent(getActivity(), RestaurantActivity.class);
+                //intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                intent.putExtra("type","Bar");
                 getActivity().startActivity(intent);
                 break;
             case 5:

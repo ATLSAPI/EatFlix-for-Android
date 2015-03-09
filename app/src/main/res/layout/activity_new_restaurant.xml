@@ -3,6 +3,16 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.melvin.apps.materialtests.RestaurantActivity">
+    <com.melvin.apps.materialtests.ScrimInsetsFrameLayout
+        android:id="@+id/scrimInsetsFrameLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fitsSystemWindows="true"
+        app:insetForeground="@color/myTextSecondaryColor"
+        android:elevation="10dp"
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto">
+    </com.melvin.apps.materialtests.ScrimInsetsFrameLayout>
 
     <include
         android:id="@+id/toolbar_actionbar"

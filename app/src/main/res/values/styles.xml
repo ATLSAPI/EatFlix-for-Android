@@ -15,6 +15,8 @@
         <item name="android:editTextBackground">@color/myTextSecondaryColor</item>
         <item name="drawerArrowStyle">@style/DrawerArrowStyle</item>
         <item name="android:actionMenuTextColor">@android:color/white</item>
+        <!--<item name="android:fitsSystemWindows">true</item>-->
+
 
         <item name="android:windowBackground">@color/myWindowBackground</item>
     </style>

@@ -103,7 +103,8 @@
         </activity>
         <activity
             android:name=".SplashActivity"
-            android:label="@string/title_activity_splash" >
+            android:label="@string/title_activity_splash"
+            android:theme="@style/AppTheme" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -138,10 +139,29 @@
         <activity
             android:name=".MapActivity"
             android:label="@string/title_activity_map"
-            android:parentActivityName=".RestaurantActivity" >
+            android:parentActivityName=".RestaurantActivity"
+            android:theme="@style/AppTheme" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.melvin.apps.materialtests.RestaurantActivity" />
+        </activity>
+        <activity
+            android:name=".NearMeActivity"
+            android:label="@string/title_activity_near_me" >
+        </activity>
+        <activity
+            android:name=".NearPlacesActivity"
+            android:label="@string/title_activity_near_places"
+            android:theme="@style/AppTheme">
+        </activity>
+        <activity
+            android:name=".SinglePlaceActivity"
+            android:label="@string/title_activity_single_place"
+            android:parentActivityName=".NearPlacesActivity"
+            android:theme="@style/AppTheme">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.melvin.apps.materialtests.NearPlacesActivity" />
         </activity>
     </application>
 

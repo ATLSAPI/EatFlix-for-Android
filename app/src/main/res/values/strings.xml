@@ -43,7 +43,7 @@
         <item>Henry</item>
         <item>Schuster</item>
     </string-array>
-‏                    <!--  -->
+‏                                <!--  -->
 
     <string name="reviews_header">Reviews</string>
     <string name="profile_header">My Profile</string>
@@ -67,7 +67,11 @@
     <string name="register">Register</string>
     <string name="sendto">Share with</string>
     <string name="details">Enter your review here</string>
-    <string name="title_activity_map">MapActivity</string>
-    <string name="map_launcher_text">MAP VIEW</string>
+    <string name="title_activity_map">Restaurants</string>
+    <string name="map_launcher_text">Map View</string>
+    <string name="list_launcher_text">List View</string>
+    <string name="title_activity_near_me">NearMe</string>
+    <string name="title_activity_near_places">Nearby</string>
+    <string name="title_activity_single_place">SinglePlaceActivity</string>
 
 </resources>

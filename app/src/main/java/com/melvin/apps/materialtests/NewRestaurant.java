@@ -13,6 +13,7 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.provider.MediaStore;
+import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -26,6 +27,7 @@ import android.widget.Spinner;
 import android.widget.Toast;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.entity.mime.MultipartEntity;
 import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.entity.mime.content.StringBody;
@@ -33,6 +35,10 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -40,6 +46,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.util.concurrent.ExecutionException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -50,11 +57,14 @@ public class NewRestaurant extends ActionBarActivity {
     Intent intent;
     String imagePath, fileName;
     public static final String TAG = NewRestaurant.class.getSimpleName();
+    protected String latitude = "";
+    protected String longitude = "";
     private static int RESULT_LOAD_IMAGE = 1;
     ProgressDialog progress, progress2;
     String path;
     Bitmap bitmap;
     private SharedPreferences sharedPreferences;
+    private String output = "";
 
 
     public static String image = "";
@@ -66,12 +76,14 @@ public class NewRestaurant extends ActionBarActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Bundle bundle = savedInstanceState != null ? savedInstanceState : getIntent().getExtras();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_restaurant);
         mToolbar = (Toolbar) findViewById(R.id.toolbar_actionbar);
         setSupportActionBar(mToolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
+        getWindow().setStatusBarColor(R.color.myTextSecondaryColor);
 //        b1 = (Button) findViewById(R.id.image_btn);
 //        b2 = (Button) findViewById(R.id.sub_btn);
         progress = new ProgressDialog(this);
@@ -87,6 +99,18 @@ public class NewRestaurant extends ActionBarActivity {
         sp2 = (Spinner) findViewById(R.id.type_cuisine);
         sharedPreferences = getSharedPreferences("Auth", MODE_PRIVATE);
         imagePath = "";
+        try {
+            String name = bundle.getString("name");
+            String address = bundle.getString("address");
+            latitude = bundle.getString("latitude");
+            longitude = bundle.getString("longitude");
+            et1.setText(name);
+            et5.setText(address);
+        }
+        catch (NullPointerException e)
+        {
+            e.printStackTrace();
+        }
 
 
     }
@@ -129,6 +153,8 @@ public class NewRestaurant extends ActionBarActivity {
             multipartEntity.addPart("town",new StringBody(town));
             multipartEntity.addPart("cuisine_id",new StringBody(cuisine_id));
             multipartEntity.addPart("type_id",new StringBody(type_id));
+            multipartEntity.addPart("latitude",new StringBody(latitude));
+            multipartEntity.addPart("longitude",new StringBody(longitude));
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
@@ -208,6 +234,11 @@ public class NewRestaurant extends ActionBarActivity {
                     android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
             startActivityForResult(i, RESULT_LOAD_IMAGE);
         }
+        else if(id == android.R.id.home)
+        {
+            NavUtils.navigateUpFromSameTask(this);
+            return true;
+        }
         else if(id == R.id.submit_restaurant) {
 
 
@@ -234,6 +265,7 @@ public class NewRestaurant extends ActionBarActivity {
             }
             String regex = "^[A-Z]{1,2}[0-9R][0-9A-Z]? [0-9][ABD-HJLNP-UW-Z]{2}$";
             Pattern pattern = Pattern.compile(regex);
+            String postcode_text = et4.getText().toString();
             Matcher matcher = pattern.matcher(et4.getText().toString().trim());
             if (!matcher.matches()) {
                 et4.setError("Postcode not valid");
@@ -282,15 +314,40 @@ public class NewRestaurant extends ActionBarActivity {
             }
 
 
+
             //Toast.makeText(NewRestaurant.this, "File is too big. Max 200KB", Toast.LENGTH_LONG).show();
             if (valid) {
+
+
                 progress2.setTitle("Loading");
                 progress2.setMessage("Wait while loading...");
                 progress2.show();
-                try {
-                    new PostAsync().execute("Post");
-                } catch (Exception e) {
-                    Toast.makeText(NewRestaurant.this, "Error!!!"+e.toString(), Toast.LENGTH_LONG).show();
+
+                if (!latitude.equals("") && !longitude.equals("")) {
+
+                    String address_this = address_edit_text.replace(" ", "+") + town.replace(" ", "+") + postcode_text.replace(" ", "+") + "+UK";
+                    try {
+                        output = new GetLatLngFromAddress().execute(address_this).get();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    } catch (ExecutionException e) {
+                        e.printStackTrace();
+                    }
+                    if (!output.trim().isEmpty()) {
+                        //contactViewHolder.coordinates.setText(output);
+                        String[] lat_lng = output.split(",");
+                        latitude = lat_lng[0];
+                        longitude = lat_lng[1];
+
+                        try {
+                            new PostAsync().execute("Post");
+                        } catch (Exception e) {
+                            Toast.makeText(NewRestaurant.this, "Error!!!" + e.toString(), Toast.LENGTH_LONG).show();
+                        }
+                    } else {
+                        progress2.dismiss();
+                        Toast.makeText(NewRestaurant.this, "Address not found, Please enter a valid address", Toast.LENGTH_LONG).show();
+                    }
                 }
             }
 
@@ -361,6 +418,60 @@ public class NewRestaurant extends ActionBarActivity {
             ///
         }
 
+    }
+    private class GetLatLngFromAddress extends AsyncTask<String, String, String>{
+
+        @Override
+        protected String doInBackground(String... strings) {
+//            String url = "https://maps.googleapis.com/maps/api/geocode/json?address=1600+Amphitheatre+Parkway,+Mountain+View,+CA&key=AIzaSyCbsof3EMi0eHl8nZuobes6Mj_W768iSec";
+//            String url = "https://maps.googleapis.com/maps/api/geocode/json?address=47+The+Linkway+Horwich,BL66JAUK&key=AIzaSyCbsof3EMi0eHl8nZuobes6Mj_W768iSec";
+            String url = "https://maps.googleapis.com/maps/api/geocode/json?address="+strings[0]+"&key=AIzaSyCbsof3EMi0eHl8nZuobes6Mj_W768iSec";
+            HttpClient httpclient = new DefaultHttpClient();
+            HttpGet httpGet = new HttpGet(url);
+            HttpResponse response = null;
+            try {
+
+                response = httpclient.execute(httpGet);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            String data = null;
+            int status = 0;
+            if (response != null) {
+                status = response.getStatusLine().getStatusCode();
+            }
+
+            if (status == 200) {
+                //Login success
+                HttpEntity entity = response.getEntity();
+                try {
+                    data = EntityUtils.toString(entity);
+                    try {
+                        JSONObject jsonObject= new JSONObject(data);
+                        JSONArray results = jsonObject.getJSONArray("results");
+                        JSONObject location = (JSONObject) results.get(0);
+                        JSONObject geometry = location.getJSONObject("geometry");
+                        JSONObject locationJSONObject = geometry.getJSONObject("location");
+                        double latitude = locationJSONObject.getDouble("lat");
+                        double longitude = locationJSONObject.getDouble("lng");
+                        data = latitude+","+longitude;
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                        data = "";
+                    }
+                } catch (IOException e) {
+                    data = "";
+                }
+            }
+            return data;
+        }
+
+//        @Override
+//        protected void onPostExecute(String s) {
+//            //Toast.makeText(RestaurantActivity.this, s, Toast.LENGTH_LONG).show();
+//            super.onPostExecute(s);
+//
+//        }
     }
     public byte[] getBytesFromBitmap(Bitmap bitmap) {
         ByteArrayOutputStream stream = new ByteArrayOutputStream();

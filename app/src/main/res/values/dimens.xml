@@ -7,6 +7,7 @@
     <dimen name="padding">15dp</dimen>
     <dimen name="profile_pic">5dp</dimen>
     <dimen name="profile">15dp</dimen>
+    <dimen name="default_height">220dp</dimen>
     <dimen name="widget_vertical_margin">15dp</dimen>
     <dimen name="register_vertical_margin">10dp</dimen>
     <!-- Per the design guidelines, navigation drawers should be between 240dp and 320dp:
